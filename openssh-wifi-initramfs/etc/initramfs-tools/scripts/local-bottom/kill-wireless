@@ -13,6 +13,7 @@ prereqs)
 esac
 
 . /scripts/functions
+. /scripts/wireless.conf
 
 echo ""
 log_success_msg "Killing wireless"
