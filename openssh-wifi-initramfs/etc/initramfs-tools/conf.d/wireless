@@ -1,9 +1,13 @@
-# Replace with your wifi card's name
+# Replace with your WiFi card's name
 WIRELESS_INTERFACE="<card>"
+export WIRELESS_INTERFACE
 
-# Replace with the modules you do not need for your wifi card
+# Replace with the modules you need for your WiFi card
 WIRELESS_MODULES="<module> <module>..."
+export WIRELESS_MODULES
 
-# Replace with your wifi credentials
+# Replace with your WiFi credentials
 WIRELESS_SSID="<your ssid>"
+export WIRELESS_SSID
 WIRELESS_PASSWORD="<your password>"
+export WIRELESS_PASSWORD
