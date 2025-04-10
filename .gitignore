@@ -1,0 +1,10 @@
+**/debian/*
+!**/debian/control
+!**/debian/changelog
+!**/debian/rules
+
+*.deb
+*.buildinfo
+*.changes
+*.dsc
+*.tar.gz
