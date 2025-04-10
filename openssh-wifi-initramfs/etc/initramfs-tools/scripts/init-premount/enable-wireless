@@ -18,7 +18,7 @@ AUTH_LIMIT=30
 alias WPACLI="/sbin/wpa_cli -p /tmp/initram-wpa_supplicant -i ${WIRELESS_INTERFACE}"
 
 echo ""
-log_begin_msg "Starting wireless connection"
+log_begin_msg "Starting wireless connection on ${WIRELESS_INTERFACE}"
 /sbin/wpa_supplicant -B -i ${WIRELESS_INTERFACE} -c /etc/wpa_supplicant.conf -P /run/initram-wpa_supplicant.pid -f /tmp/initram-wpa_supplicant.log
 
 limit=${AUTH_LIMIT}
