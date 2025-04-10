@@ -3,6 +3,7 @@
 !**/debian/changelog
 !**/debian/copyright
 !**/debian/rules
+!**/debian/install
 !**/debian/postinst
 
 *.deb
