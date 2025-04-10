@@ -14,6 +14,8 @@ esac
 
 . /usr/share/initramfs-tools/hook-functions
 
+copy_file config /etc/initramfs-tools/conf.d/wireless /scripts/wireless.conf
+
 manual_add_modules ${WIRELESS_MODULES}
 copy_exec /sbin/wpa_supplicant
 copy_exec /sbin/wpa_cli

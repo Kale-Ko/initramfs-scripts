@@ -13,6 +13,7 @@ prereqs)
 esac
 
 . /scripts/functions
+. /scripts/wireless.conf
 
 AUTH_LIMIT=30
 alias WPACLI="/sbin/wpa_cli -p /tmp/initram-wpa_supplicant -i ${WIRELESS_INTERFACE}"

@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Replace with your WiFi card's name
 WIRELESS_INTERFACE="<card>"
 export WIRELESS_INTERFACE
