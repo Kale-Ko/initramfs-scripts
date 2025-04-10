@@ -1,2 +1,9 @@
-WIRELESS_INTERFACE=wlp1s0
-WIRELESS_MODULES=rtw89_8852ae
+# Replace with your wifi card's name
+WIRELESS_INTERFACE="<card>"
+
+# Replace with the modules you do not need for your wifi card
+WIRELESS_MODULES="<module> <module>..."
+
+# Replace with your wifi credentials
+WIRELESS_SSID="<your ssid>"
+WIRELESS_PASSWORD="<your password>"
