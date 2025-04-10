@@ -3,7 +3,6 @@
 BUILD_PATH=openssh-wifi-initramfs/
 
 build:
-	cp LICENSE $(BUILD_PATH)/debian/copyright
 	dpkg-buildpackage $(BUILD_PATH)
 
 clean:

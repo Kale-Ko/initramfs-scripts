@@ -1,7 +1,9 @@
 **/debian/*
 !**/debian/control
 !**/debian/changelog
+!**/debian/copyright
 !**/debian/rules
+!**/debian/postinst
 
 *.deb
 *.buildinfo
