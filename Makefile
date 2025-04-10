@@ -6,7 +6,7 @@ build:
 	dpkg-buildpackage $(BUILD_PATH)
 
 install: build
-	sudo dpkg --purge openssh-wifi-initramfs
+	sudo dpkg --remove openssh-wifi-initramfs
 	sudo dpkg --install $$(cat openssh-wifi-initramfs/debian/files | grep -o *.deb)
 
 clean:

@@ -14,9 +14,6 @@ esac
 
 . /usr/share/initramfs-tools/hook-functions
 
-echo ${WIRELESS_MODULES} >/dev/stderr
-echo ${WIRELESS_MODULES} >/dev/stdout
-
 manual_add_modules ${WIRELESS_MODULES}
 copy_exec /sbin/wpa_supplicant
 copy_exec /sbin/wpa_cli
