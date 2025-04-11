@@ -15,5 +15,7 @@ esac
 . /scripts/functions
 . /scripts/wireless.conf
 
-echo "Killing wireless"
-kill $(cat /run/initram-wpa_supplicant.pid)
+if grep -qw "wireless" /proc/cmdline; then
+    echo "Killing wireless"
+    kill $(cat /run/initram-wpa_supplicant.pid)
+fi

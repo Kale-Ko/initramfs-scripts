@@ -16,29 +16,32 @@ esac
 . /scripts/wireless.conf
 
 AUTH_LIMIT=30
-alias WPACLI="/sbin/wpa_cli -p /tmp/initram-wpa_supplicant -i ${WIRELESS_INTERFACE}"
 
-echo "Starting wireless connection on ${WIRELESS_INTERFACE}"
-/sbin/wpa_supplicant -B -i ${WIRELESS_INTERFACE} -c /etc/wpa_supplicant.conf -P /run/initram-wpa_supplicant.pid -f /tmp/initram-wpa_supplicant.log
+if grep -qw "wireless" /proc/cmdline; then
+    alias WPACLI="/sbin/wpa_cli -p /tmp/initram-wpa_supplicant -i ${WIRELESS_INTERFACE}"
 
-limit=${AUTH_LIMIT}
-echo -n "Waiting for connection (max ${AUTH_LIMIT} seconds)"
-while [ $limit -ge 0 -a $(WPACLI status | grep wpa_state) != "wpa_state=COMPLETED" ]; do
-    sleep 1
-    echo -n "."
-    limit=$(expr $limit - 1)
-done
-echo ""
+    echo "Starting wireless connection on ${WIRELESS_INTERFACE}"
+    /sbin/wpa_supplicant -B -i ${WIRELESS_INTERFACE} -c /etc/wpa_supplicant.conf -P /run/initram-wpa_supplicant.pid -f /tmp/initram-wpa_supplicant.log
 
-if [ $(WPACLI status | grep wpa_state) != "wpa_state=COMPLETED" ]; then
-    export ONLINE=0
-    echo "Wireless offline after timeout"
-    panic
-else
-    export ONLINE=1
-    echo "Wireless online"
+    limit=${AUTH_LIMIT}
+    echo -n "Waiting for connection (max ${AUTH_LIMIT} seconds)"
+    while [ $limit -ge 0 -a $(WPACLI status | grep wpa_state) != "wpa_state=COMPLETED" ]; do
+        sleep 1
+        echo -n "."
+        limit=$(expr $limit - 1)
+    done
+    echo ""
+
+    if [ $(WPACLI status | grep wpa_state) != "wpa_state=COMPLETED" ]; then
+        export ONLINE=0
+        echo "Wireless offline after timeout"
+        panic
+    else
+        export ONLINE=1
+        echo "Wireless online"
+    fi
+
+    configure_networking
+
+    echo "Wireless configured"
 fi
-
-configure_networking
-
-echo "Wireless configured"
