@@ -1,0 +1,68 @@
+#!/bin/sh
+set -e
+
+PREREQ=""
+prereqs() {
+    echo "${PREREQ}"
+}
+case "${1}" in
+prereqs)
+    prereqs
+    exit 0
+    ;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+copy_file config /etc/initramfs-tools/conf.d/openssh /scripts/openssh.conf
+
+copy_exec /bin/ssh
+copy_exec /sbin/sshd
+
+mkdir -p ${OPENSSH_CONFIG_DIRECTORY}/
+
+if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/sshd_config >/dev/null 2>&1; then
+    cat >${OPENSSH_CONFIG_DIRECTORY}/sshd_config <<EOF
+# This is not a complete configuration, for a complete list of options see sshd_config(5).
+
+Port 2222 # This is always overridden
+AddressFamily any
+ListenAddress 0.0.0.0 # Listen on all interfaces
+ListenAddress ::
+
+UsePAM no # PAM is not loaded and there-for cannot be used.
+PermitRootLogin prohibit-password # We may be using root as the login user
+
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+HostbasedAuthentication no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+GSSAPIAuthentication no
+UseDNS no # We do not have a DNS server setup and it is not needed
+
+PrintMotd no
+PrintLastLog yes
+Banner none
+
+AcceptEnv LANG LC_*
+EOF
+fi
+
+if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_host_*key >/dev/null 2>&1; then
+    if [ ${OPENSSH_GENERATE_KEYS} = "true" ]; then
+        echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new keys."
+
+        mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
+        ssh-keygen -Ah -f /tmp/initramfs-ssh/ -N ""
+        cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
+        rm -rf /tmp/initramfs-ssh/
+    else
+        echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY} and OPENSSH_GENERATE_KEYS is set to false."
+    fi
+fi
+
+for file in ${OPENSSH_CONFIG_DIRECTORY}/*; do
+    copy_file config $file /etc/ssh/
+done
