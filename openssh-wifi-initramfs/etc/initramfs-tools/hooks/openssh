@@ -76,3 +76,15 @@ fi
 for file in ${OPENSSH_CONFIG_DIRECTORY}/*; do
     copy_file config $file /etc/ssh/
 done
+
+cat >/tmp/initramfs-passwd <<EOF
+root:*:0:0:root:/tmp/initramfs-root:/bin/sh
+sshd:*:100:65534::/run/initramfs-sshd:/sbin/nologin
+EOF
+cat >/tmp/initramfs-group <<EOF
+root:*:0:
+EOF
+
+rm -f $DESTDIR/etc/passwd $DESTDIR/etc/group
+copy_file config /tmp/initramfs-passwd /etc/passwd
+copy_file config /tmp/initramfs-group /etc/group
