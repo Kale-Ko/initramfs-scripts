@@ -60,6 +60,16 @@ if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_host_*key >/dev/null 2>&1; then
         rm -rf /tmp/initramfs-ssh/
     else
         echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY} and OPENSSH_GENERATE_KEYS is set to false."
+        exit 1
+    fi
+fi
+
+if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/moduli >/dev/null 2>&1; then
+    if [ -f /etc/ssh/moduli ]; then
+        cp /etc/ssh/moduli ${OPENSSH_CONFIG_DIRECTORY}
+    else
+        echo "SSH moduli file does not exist in ${OPENSSH_CONFIG_DIRECTORY} or /etc/ssh/."
+        exit 1
     fi
 fi
 
