@@ -1,4 +1,6 @@
 etc/initramfs-tools/conf.d/wireless etc/initramfs-tools/conf.d/
 etc/initramfs-tools/hooks/wireless etc/initramfs-tools/hooks/
+etc/initramfs-tools/conf.d/openssh etc/initramfs-tools/conf.d/
+etc/initramfs-tools/hooks/openssh etc/initramfs-tools/hooks/
 etc/initramfs-tools/scripts/init-premount/enable-wireless etc/initramfs-tools/scripts/init-premount/
 etc/initramfs-tools/scripts/local-bottom/kill-wireless etc/initramfs-tools/scripts/local-bottom/
