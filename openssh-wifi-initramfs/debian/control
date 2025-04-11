@@ -13,6 +13,6 @@ Package: openssh-wifi-initramfs
 Architecture: any
 Section: base
 Priority: optional
-Depends: initramfs-tools, cryptsetup, cryptsetup-initramfs
+Depends: initramfs-tools, wpasupplicant, openssh-client, openssh-server, cryptsetup, cryptsetup-initramfs
 Description: TODO
 Homepage: https://github.com/Kale-Ko/openssh-wifi-initramfs
