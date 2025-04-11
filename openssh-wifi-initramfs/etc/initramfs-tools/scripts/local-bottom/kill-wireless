@@ -18,4 +18,5 @@ esac
 if grep -qw "wireless" /proc/cmdline; then
     echo "Killing wireless"
     kill $(cat /run/initram-wpa_supplicant.pid)
+    rm /run/initram-wpa_supplicant.pid
 fi
