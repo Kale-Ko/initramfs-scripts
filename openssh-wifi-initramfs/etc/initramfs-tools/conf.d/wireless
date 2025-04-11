@@ -9,6 +9,7 @@ WIRELESS_MODULES="<module> <module>..."
 export WIRELESS_MODULES
 
 # Replace with your WiFi credentials
+# If you wish to use a different WiFi authentication method view wpa_supplicant.conf in initramfs-tools/hooks/wireless
 WIRELESS_SSID="<your ssid>"
 export WIRELESS_SSID
 WIRELESS_PASSWORD="<your password>"
