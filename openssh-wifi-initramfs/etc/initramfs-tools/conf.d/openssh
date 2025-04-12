@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# Replace with your desired port number to listen on
-OPENSSH_PORT=2222
-export OPENSSH_PORT
+# Replace with your desired port numbers to listen on
+OPENSSH_PORTS=2222,2223
+export OPENSSH_PORTS
 
 # The location of all openssh configs (sshd_config and server keys)
 OPENSSH_CONFIG_DIRECTORY=/etc/initramfs-ssh/
