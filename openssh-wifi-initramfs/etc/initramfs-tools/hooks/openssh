@@ -25,7 +25,7 @@ if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/sshd_config >/dev/null 2>&1; then
     cat >${OPENSSH_CONFIG_DIRECTORY}/sshd_config <<EOF
 # This is not a complete configuration, for a complete list of options see sshd_config(5).
 
-Port 2222 # This is always overridden
+Port ${OPENSSH_PORT} # This is always overridden
 AddressFamily any
 ListenAddress 0.0.0.0 # Listen on all interfaces
 ListenAddress ::
@@ -51,7 +51,7 @@ EOF
 fi
 
 if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_host_*key >/dev/null 2>&1; then
-    if [ ${OPENSSH_GENERATE_KEYS} = "true" ]; then
+    if [ ${OPENSSH_GENERATE_SERVER_KEYS} = "true" ]; then
         echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new keys."
 
         mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
@@ -59,7 +59,7 @@ if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_host_*key >/dev/null 2>&1; then
         cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
         rm -rf /tmp/initramfs-ssh/
     else
-        echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY} and OPENSSH_GENERATE_KEYS is set to false."
+        echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY} and OPENSSH_GENERATE_SERVER_KEYS is set to false."
         exit 1
     fi
 fi
@@ -74,7 +74,9 @@ if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/moduli >/dev/null 2>&1; then
 fi
 
 for file in ${OPENSSH_CONFIG_DIRECTORY}/*; do
-    copy_file config $file /etc/ssh/
+    if [ ! -e ${OPENSSH_AUTHORIZED_KEYS_FILE} ] || [ $(realpath $file) != $(realpath ${OPENSSH_AUTHORIZED_KEYS_FILE}) ]; then
+        copy_file config $file /etc/ssh/
+    fi
 done
 
 cat >/tmp/initramfs-passwd <<EOF
@@ -84,6 +86,27 @@ EOF
 cat >/tmp/initramfs-group <<EOF
 root:*:0:
 EOF
+
+home=/root
+
+if [ ${OPENSSH_AUTHORIZED_USER} != "root" ]; then
+    cat >>/tmp/initramfs-passwd <<EOF
+${OPENSSH_AUTHORIZED_USER}:*:1000:1000:${OPENSSH_AUTHORIZED_USER}:/tmp/initramfs-user:/bin/sh
+EOF
+    cat >>/tmp/initramfs-group <<EOF
+${OPENSSH_AUTHORIZED_USER}:*:1000:
+EOF
+
+    home=/tmp/initramfs-user
+fi
+
+if stat -t ${OPENSSH_AUTHORIZED_KEYS_FILE} >/dev/null 2>&1; then
+    mkdir -p $home/.ssh/
+    copy_file config ${OPENSSH_AUTHORIZED_KEYS_FILE} $home/.ssh/authorized_keys
+else
+    echo "SSH authorized_keys file ${OPENSSH_AUTHORIZED_KEYS_FILE} does not exist."
+    exit 1
+fi
 
 rm -f $DESTDIR/etc/passwd $DESTDIR/etc/group
 copy_file config /tmp/initramfs-passwd /etc/passwd

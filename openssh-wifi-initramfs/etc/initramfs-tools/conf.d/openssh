@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Replace with your desired port number to listen on
+OPENSSH_PORT=2222
+export OPENSSH_PORT
+
+# The location of all openssh configs (sshd_config and server keys)
+OPENSSH_CONFIG_DIRECTORY=/etc/initramfs-ssh/
+export OPENSSH_CONFIG_DIRECTORY
+
+# If there are no server keys, generate new ones.
+OPENSSH_GENERATE_SERVER_KEYS=true
+export OPENSSH_GENERATE_SERVER_KEYS
+
+# The user to be used for authorization
+OPENSSH_AUTHORIZED_USER=root
+export OPENSSH_AUTHORIZED_USER
+
+# The path to the authorized keys list
+OPENSSH_AUTHORIZED_KEYS_FILE=/etc/initramfs-ssh/authorized_keys
+export OPENSSH_AUTHORIZED_KEYS_FILE
