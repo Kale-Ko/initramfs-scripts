@@ -21,7 +21,7 @@ copy_exec /sbin/wpa_supplicant
 copy_exec /sbin/wpa_cli
 
 cat >/tmp/initramfs-wpa_supplicant.conf <<EOF
-ctrl_interface=/run/initram-wpa_supplicant.sock
+ctrl_interface=/run/initram-wpa_supplicant_interface
 
 network={
     ssid="${WIRELESS_SSID}"

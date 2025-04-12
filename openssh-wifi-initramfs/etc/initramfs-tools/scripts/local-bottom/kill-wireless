@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-PREREQ=""
+PREREQ="stop-openssh"
 prereqs() {
     echo "$PREREQ"
 }
@@ -18,5 +18,7 @@ esac
 if grep -qw "wireless" /proc/cmdline; then
     echo "Killing wireless"
     kill $(cat /run/initram-wpa_supplicant.pid)
-    rm -f /run/initram-wpa_supplicant.sock /run/initram-wpa_supplicant.pid
+
+    rm -rf /run/initram-wpa_supplicant_interface
+    rm -f /run/initram-wpa_supplicant.pid
 fi
