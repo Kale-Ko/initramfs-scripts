@@ -25,7 +25,6 @@ if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/sshd_config >/dev/null 2>&1; then
     cat >${OPENSSH_CONFIG_DIRECTORY}/sshd_config <<EOF
 # This is not a complete configuration, for a complete list of options see sshd_config(5).
 
-Port ${OPENSSH_PORT} # This is always overridden
 AddressFamily any
 ListenAddress 0.0.0.0 # Listen on all interfaces
 ListenAddress ::
