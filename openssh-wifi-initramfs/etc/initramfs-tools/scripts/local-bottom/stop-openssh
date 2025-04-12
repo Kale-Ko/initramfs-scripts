@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+PREREQ=""
+prereqs() {
+    echo "$PREREQ"
+}
+case $1 in
+prereqs)
+    prereqs
+    exit 0
+    ;;
+esac
+
+. /scripts/functions
+. /scripts/openssh.conf
+
+if grep -qw "openssh" /proc/cmdline; then
+    echo "Killing OpenSSH"
+    kill $(cat /run/initram-openssh.pid)
+
+    rm -f /run/initram-openssh.pid
+fi
