@@ -5,9 +5,11 @@
 !**/debian/rules
 !**/debian/install
 !**/debian/postinst
+!**/debian/postrm
 
 *.deb
 *.buildinfo
 *.changes
 *.dsc
+*.asc
 *.tar.gz
