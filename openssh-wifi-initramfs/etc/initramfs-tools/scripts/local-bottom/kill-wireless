@@ -21,4 +21,6 @@ if grep -qw "wireless" /proc/cmdline; then
 
     rm -rf /run/initram-wpa_supplicant_interface
     rm -f /run/initram-wpa_supplicant.pid
+
+    echo "Killed wireless"
 fi

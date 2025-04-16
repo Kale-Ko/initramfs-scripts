@@ -26,9 +26,8 @@ if grep -qw "wireless" /proc/cmdline; then
     limit=${AUTH_LIMIT}
     echo "Waiting for connection (max ${AUTH_LIMIT} seconds)"
     while [ $limit -ge 0 -a "$($WPA_COMMAND status | grep wpa_state)" != "wpa_state=COMPLETED" ]; do
-        echo $($WPA_COMMAND status | grep wpa_state)
+        echo -n "."
         sleep 1
-        # echo -n "."
         limit=$(expr $limit - 1)
     done
     echo ""
@@ -41,7 +40,6 @@ if grep -qw "wireless" /proc/cmdline; then
         export ONLINE=1
         echo "Wireless online"
     fi
-    echo $($WPA_COMMAND status | grep wpa_state)
 
     configure_networking
 
