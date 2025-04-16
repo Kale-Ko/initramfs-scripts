@@ -20,4 +20,6 @@ if grep -qw "openssh" /proc/cmdline; then
     kill $(cat /run/initram-openssh.pid)
 
     rm -f /run/initram-openssh.pid
+
+    echo "Killed OpenSSH"
 fi
