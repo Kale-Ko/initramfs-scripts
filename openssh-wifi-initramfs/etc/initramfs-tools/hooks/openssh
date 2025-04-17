@@ -19,6 +19,10 @@ copy_file config /etc/initramfs-tools/conf.d/openssh /scripts/openssh.conf
 copy_exec /bin/ssh
 copy_exec /sbin/sshd
 
+for file in /lib/openssh/*; do
+    copy_exec $file
+done
+
 mkdir -p ${OPENSSH_CONFIG_DIRECTORY}/
 
 if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/sshd_config >/dev/null 2>&1; then
@@ -80,11 +84,13 @@ done
 
 cat >/tmp/initramfs-passwd <<EOF
 root:*:0:0:root:/tmp/initramfs-root:/bin/sh
-sshd:*:100:65534::/run/initramfs-sshd:/sbin/nologin
+sshd:*:100:65534::/run/sshd:/sbin/nologin
 EOF
 cat >/tmp/initramfs-group <<EOF
 root:*:0:
 EOF
+mkdir -p /run/sshd
+chown root:root -R /run/sshd
 
 home=/root
 
