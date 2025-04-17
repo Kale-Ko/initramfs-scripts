@@ -92,7 +92,7 @@ EOF
 mkdir -p /run/sshd
 chown root:root -R /run/sshd
 
-home=/root
+home=/tmp/initramfs-root
 
 if [ ${OPENSSH_AUTHORIZED_USER} != "root" ]; then
     cat >>/tmp/initramfs-passwd <<EOF
