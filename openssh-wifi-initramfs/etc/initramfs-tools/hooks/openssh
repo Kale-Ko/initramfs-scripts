@@ -45,6 +45,8 @@ KbdInteractiveAuthentication no
 GSSAPIAuthentication no
 UseDNS no # We do not have a DNS server setup and it is not needed
 
+ForceCommand /bin/cryptroot-unlock # Force the client to run cryptroot-unlock upon login
+
 PrintMotd no
 PrintLastLog yes
 Banner none
