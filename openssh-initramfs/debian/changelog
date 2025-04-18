@@ -1,6 +1,6 @@
 openssh-initramfs (1.0-0) any; urgency=low
 
   * Created package
-    - Contains base openssh script
+    - Contains base OpenSSH script
 
- -- Kale-Ko <github@kaleko.dev>  Thu, 10 Apr 2025 12:00:00 -0400
+ -- Kale-Ko <github@kaleko.dev>  Thu, 18 Apr 2025 12:00:00 -0400

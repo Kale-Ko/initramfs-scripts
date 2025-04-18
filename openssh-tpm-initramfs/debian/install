@@ -1,3 +1,4 @@
 etc/initramfs-tools/conf.d/* etc/initramfs-tools/conf.d/
 usr/share/initramfs-tools/hooks/* usr/share/initramfs-tools/hooks/
 usr/share/initramfs-tools/scripts/* usr/share/initramfs-tools/scripts/
+usr/share/ssh-tpm-agent/* usr/share/ssh-tpm-agent/
