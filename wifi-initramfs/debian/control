@@ -14,5 +14,5 @@ Architecture: any
 Section: base
 Priority: optional
 Depends: initramfs-tools, wpasupplicant
-Description: TODO
+Description: An initramfs-tools script to connect to a network during boot for remote login
 Homepage: https://github.com/Kale-Ko/initramfs-scripts

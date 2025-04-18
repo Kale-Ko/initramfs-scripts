@@ -14,5 +14,5 @@ Architecture: any
 Section: base
 Priority: optional
 Depends: initramfs-tools, openssh-client, openssh-server, cryptsetup, cryptsetup-initramfs
-Description: TODO
+Description: An initramfs-tools script to startup an OpenSSH server during cryptsetup for remote login
 Homepage: https://github.com/Kale-Ko/initramfs-scripts

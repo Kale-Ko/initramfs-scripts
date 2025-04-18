@@ -14,5 +14,5 @@ Architecture: any
 Section: base
 Priority: optional
 Depends: openssh-initramfs (= 1.0-0), initramfs-tools, openssh-client, openssh-server, cryptsetup, cryptsetup-initramfs
-Description: TODO
+Description: An initramfs-tools script to allow the OpenSSH server to use a host key from the onboard TPM.
 Homepage: https://github.com/Kale-Ko/initramfs-scripts
