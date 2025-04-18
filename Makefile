@@ -51,3 +51,4 @@ pull-upstream:
 	mkdir -p openssh-tpm-initramfs/usr/share/ssh-tpm-agent/
 	tar -xzf .ssh-tpm-agent.tar.gz -C openssh-tpm-initramfs/usr/share/ssh-tpm-agent/ --strip-components 1
 	rm -f .ssh-tpm-agent-releases.json .ssh-tpm-agent.tar.gz
+	find openssh-tpm-initramfs/usr/share/ssh-tpm-agent/ -type f ! -name "LICENSE" -exec strip --strip-all {} \;
