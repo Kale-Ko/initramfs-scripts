@@ -1,0 +1,43 @@
+#!/bin/sh
+set -e
+
+PREREQ=""
+
+if [ -f "$(dirname $(realpath $0))/enable-wireless" ]; then
+    PREREQ="${PREREQ} enable-wireless"
+fi
+
+prereqs() {
+    echo "$PREREQ"
+}
+case $1 in
+prereqs)
+    prereqs
+    exit 0
+    ;;
+esac
+
+. /scripts/functions
+. /scripts/openssh.conf
+
+if grep -qw "openssh" /proc/cmdline; then
+    echo "Starting OpenSSH server on ${OPENSSH_PORTS}"
+
+    mkdir -p /run/sshd
+    chown root:root -R /run/sshd
+
+    IFS=','
+    ports=
+    for port in ${OPENSSH_PORTS}; do
+        ports="$ports -p $port"
+    done
+
+    IFS=' '
+    keys=
+    for file in /etc/ssh/ssh_host_*key; do
+        keys="$keys -h $file "
+    done
+
+    /sbin/sshd -D -o PidFile=/run/initram-openssh.pid $ports -f /etc/ssh/sshd_config $keys &
+    echo "Started OpenSSH server"
+fi
