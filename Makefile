@@ -22,3 +22,11 @@ cleanartifacts:
 	rm -f openssh-tpm-initramfs_*.tar.gz openssh-tpm-initramfs_*.deb openssh-tpm-initramfs_*.buildinfo openssh-tpm-initramfs_*.changes openssh-tpm-initramfs_*.dsc
 
 cleanall: clean cleanartifacts
+
+pull:
+	curl -sSL https://api.github.com/repos/Foxboron/ssh-tpm-agent/releases/latest -o .ssh-tpm-agent-releases.json
+	curl -sSL $$(cat .ssh-tpm-agent-releases.json | jq -r '.assets[] | select(.name | test("^ssh-tpm-agent-v[0-9.-_]+-linux-amd64\\.tar\\.gz$$")) | .browser_download_url') -o .ssh-tpm-agent.tar.gz
+	rm -rf openssh-tpm-initramfs/usr/share/ssh-tpm-agent/
+	mkdir -p openssh-tpm-initramfs/usr/share/ssh-tpm-agent/
+	tar -xzf .ssh-tpm-agent.tar.gz -C openssh-tpm-initramfs/usr/share/ssh-tpm-agent/ --strip-components 1
+	rm -f .ssh-tpm-agent-releases.json .ssh-tpm-agent.tar.gz
