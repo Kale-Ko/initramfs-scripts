@@ -1,0 +1,18 @@
+Source: openssh-tpm-initramfs
+Section: base
+Priority: optional
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Homepage: https://github.com/Kale-Ko/initramfs-scripts
+VCS-Browser: https://github.com/Kale-Ko/initramfs-scripts
+VCS-git: git://github.com/Kale-Ko/initramfs-scripts.git
+Maintainer: Kale-Ko <github@kaleko.dev>
+
+Package-Type: deb
+Package: openssh-tpm-initramfs
+Architecture: any
+Section: base
+Priority: optional
+Depends: openssh-initramfs (= 1.0-0), initramfs-tools, openssh-client, openssh-server, cryptsetup, cryptsetup-initramfs
+Description: TODO
+Homepage: https://github.com/Kale-Ko/initramfs-scripts
