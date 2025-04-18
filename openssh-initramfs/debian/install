@@ -1,3 +1,3 @@
 etc/initramfs-tools/conf.d/* etc/initramfs-tools/conf.d/
-etc/initramfs-tools/hooks/* etc/initramfs-tools/hooks/
-etc/initramfs-tools/scripts/* etc/initramfs-tools/scripts/
+usr/share/initramfs-tools/hooks/* usr/share/initramfs-tools/hooks/
+usr/share/initramfs-tools/scripts/* usr/share/initramfs-tools/scripts/
