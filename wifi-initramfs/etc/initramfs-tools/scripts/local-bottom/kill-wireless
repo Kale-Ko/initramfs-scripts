@@ -1,7 +1,12 @@
 #!/bin/sh
 set -e
 
-PREREQ="stop-openssh"
+PREREQ=""
+
+if [ -f "$(dirname $(realpath $0))/stop-openssh" ]; then
+    PREREQ="${PREREQ} stop-openssh"
+fi
+
 prereqs() {
     echo "$PREREQ"
 }

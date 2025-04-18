@@ -2,6 +2,11 @@
 set -e
 
 PREREQ=""
+
+if [ -f "$(dirname $(realpath $0))/wireless" ]; then
+    PREREQ="${PREREQ} wireless"
+fi
+
 prereqs() {
     echo "${PREREQ}"
 }

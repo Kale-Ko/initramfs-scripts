@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: openssh-wifi-initramfs
+Upstream-Name: openssh-initramfs
 Upstream-Contact: Kale-Ko <contact@kaleko.dev>
-Source: https://github.com/Kale-Ko/openssh-wifi-initramfs
+Source: https://github.com/Kale-Ko/initramfs-scripts
 
 Files: *
 Copyright: Copyright (c) 2025 Kale Ko
