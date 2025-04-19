@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-PREREQ=""
+PREREQ="cryptroot cryptroot-unlock"
 
 if [ -f "$(dirname $(realpath $0))/wireless" ]; then
     PREREQ="${PREREQ} wireless"
@@ -27,6 +27,10 @@ copy_exec /sbin/sshd
 for file in /lib/openssh/*; do
     copy_exec $file
 done
+
+cp $DESTDIR/bin/cryptroot-unlock $DESTDIR/scripts/cryptroot-unlock
+chown root:root $DESTDIR/scripts/cryptroot-unlock
+chmod 0755 $DESTDIR/scripts/cryptroot-unlock
 
 copy_exec /usr/share/initramfs-tools/scripts/cryptroot-unlock-suid /scripts/cryptroot-unlock-suid
 chown root:root $DESTDIR/scripts/cryptroot-unlock-suid
