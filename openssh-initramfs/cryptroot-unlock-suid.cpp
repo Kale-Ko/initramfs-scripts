@@ -15,7 +15,7 @@ int main()
         return 1;
     }
 
-    const char* PATH = "/bin/cryptroot-unlock";
+    const char* PATH = "/scripts/cryptroot-unlock";
 
     struct stat path_stat;
     stat(PATH, &path_stat);
@@ -26,7 +26,7 @@ int main()
     }
     if (!(path_stat.st_mode & S_IRUSR) || !(path_stat.st_mode & S_IRGRP) || !(path_stat.st_mode & S_IROTH)
         || !(path_stat.st_mode & S_IXUSR) || !(path_stat.st_mode & S_IXGRP) || !(path_stat.st_mode & S_IXOTH)
-        || (path_stat.st_mode & S_IWOTH))
+        || (path_stat.st_mode & S_IWGRP) || (path_stat.st_mode & S_IWOTH))
     {
         return 1;
     }
