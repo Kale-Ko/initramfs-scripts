@@ -1,7 +1,7 @@
 Source: openssh-initramfs
 Section: base
 Priority: optional
-Build-Depends: debhelper-compat (= 13)
+Build-Depends: libc6, gcc, g++, debhelper-compat (= 13)
 Standards-Version: 4.7.2
 Homepage: https://github.com/Kale-Ko/initramfs-scripts
 VCS-Browser: https://github.com/Kale-Ko/initramfs-scripts

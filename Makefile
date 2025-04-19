@@ -5,8 +5,12 @@ build: build-wifi build-openssh build-openssh-tpm
 build-wifi:
 	dpkg-buildpackage wifi-initramfs/
 
-build-openssh:
+build-openssh: openssh-initramfs/out/cryptroot-unlock-suid
 	dpkg-buildpackage openssh-initramfs/
+
+openssh-initramfs/out/cryptroot-unlock-suid: openssh-initramfs/cryptroot-unlock-suid.cpp
+	mkdir -p openssh-initramfs/out/
+	g++ -O3 -s openssh-initramfs/cryptroot-unlock-suid.cpp -o openssh-initramfs/out/cryptroot-unlock-suid
 
 build-openssh-tpm:
 	dpkg-buildpackage openssh-tpm-initramfs/
@@ -40,6 +44,7 @@ clean-openssh-tpm:
 	rm -rf openssh-tpm-initramfs/debian/.debhelper openssh-tpm-initramfs/debian/debhelper-build-stamp openssh-tpm-initramfs/debian/openssh-tpm-initramfs openssh-tpm-initramfs/debian/files openssh-tpm-initramfs/debian/*.substvars
 
 clean-artifacts:
+	rm -rf */out/
 	rm -f wifi-initramfs_*.tar.gz wifi-initramfs_*.deb wifi-initramfs_*.buildinfo wifi-initramfs_*.changes wifi-initramfs_*.dsc
 	rm -f openssh-initramfs_*.tar.gz openssh-initramfs_*.deb openssh-initramfs_*.buildinfo openssh-initramfs_*.changes openssh-initramfs_*.dsc
 	rm -f openssh-tpm-initramfs_*.tar.gz openssh-tpm-initramfs_*.deb openssh-tpm-initramfs_*.buildinfo openssh-tpm-initramfs_*.changes openssh-tpm-initramfs_*.dsc
