@@ -96,8 +96,8 @@ EOF
 cat >/tmp/initramfs-group <<EOF
 root:*:0:
 EOF
-mkdir -p /run/sshd
-chown root:root -R /run/sshd
+mkdir -p $DESTDIR/tmp/initramfs-root $DESTDIR/run/sshd
+chown root:root -R $DESTDIR/tmp/initramfs-root $DESTDIR/run/sshd
 
 home=/tmp/initramfs-root
 
@@ -108,12 +108,14 @@ EOF
     cat >>/tmp/initramfs-group <<EOF
 ${OPENSSH_AUTHORIZED_USER}:*:1000:
 EOF
+    mkdir -p $DESTDIR/tmp/initramfs-user
+    chown ${OPENSSH_AUTHORIZED_USER}:${OPENSSH_AUTHORIZED_USER} -R $DESTDIR/tmp/initramfs-user
 
     home=/tmp/initramfs-user
 fi
 
 if stat -t ${OPENSSH_AUTHORIZED_KEYS_FILE} >/dev/null 2>&1; then
-    mkdir -p $home/.ssh/
+    mkdir -p $DESTDIR/$home/.ssh/
     copy_file config ${OPENSSH_AUTHORIZED_KEYS_FILE} $home/.ssh/authorized_keys
 else
     echo "SSH authorized_keys file ${OPENSSH_AUTHORIZED_KEYS_FILE} does not exist."
