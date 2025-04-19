@@ -29,6 +29,8 @@ for file in /lib/openssh/*; do
 done
 
 copy_exec /usr/share/initramfs-tools/scripts/cryptroot-unlock-suid /scripts/cryptroot-unlock-suid
+chown root:root $DESTDIR/scripts/cryptroot-unlock-suid
+chmod 6755 $DESTDIR/scripts/cryptroot-unlock-suid
 
 mkdir -p ${OPENSSH_CONFIG_DIRECTORY}/
 
