@@ -31,7 +31,7 @@ int main()
         return 1;
     }
 
-    char* argv[1] = { nullptr };
+    char* argv[2] = { (char*) PATH, nullptr };
     char** envp = environ;
     execve(PATH, argv, envp);
 
