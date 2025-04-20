@@ -16,6 +16,7 @@ esac
 error_func() {
     echo "enable-wireless script failed"
     panic
+    exit 1
 }
 if ! echo "$*" | grep -qw "trapped"; then
     $0 $* trapped || error_func
