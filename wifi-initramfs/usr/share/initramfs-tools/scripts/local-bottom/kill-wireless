@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+set -o pipefail
 
 PREREQ=""
 
@@ -16,6 +17,12 @@ prereqs)
     exit 0
     ;;
 esac
+
+error_func() {
+    echo "kill-wireless script failed"
+    sleep 3
+}
+trap error_func ERR
 
 . /scripts/functions
 . /scripts/wireless.conf
