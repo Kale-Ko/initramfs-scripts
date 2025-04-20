@@ -1,0 +1,17 @@
+Source: ssh-tpm-agent
+Section: base
+Priority: optional
+Build-Depends: binutils-x86-64-linux-gnu, binutils-aarch64-linux-gnu, debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Homepage: https://github.com/Foxboron/ssh-tpm-agent
+VCS-Browser: https://github.com/Foxboron/ssh-tpm-agent
+VCS-git: git://github.com/Foxboron/ssh-tpm-agent.git
+Maintainer: Kale-Ko <github@kaleko.dev>
+
+Package-Type: deb
+Package: ssh-tpm-agent
+Architecture: amd64 arm64
+Section: base
+Priority: optional
+Description: ssh-agent for TPMs.
+Homepage: https://github.com/Foxboron/ssh-tpm-agent

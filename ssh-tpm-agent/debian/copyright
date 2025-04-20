@@ -1,3 +1,13 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: ssh-tpm-agent
+Upstream-Contact: Morten Linderud <morten@linderud.pw>
+Source: https://github.com/Foxboron/ssh-tpm-agent
+
+Files: *
+Copyright: Copyright (c) 2023 ssh-tpm-agent Authors
+License: MIT
+
+License: MIT
 The MIT License (MIT)
 
 Copyright (c) 2023 ssh-tpm-agent Authors

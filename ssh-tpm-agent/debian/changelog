@@ -1,0 +1,47 @@
+ssh-tpm-agent (0.8-0) any; urgency=low
+
+  * https://github.com/Foxboron/ssh-tpm-agent/releases/tag/v0.8.0
+
+ -- Kale-Ko <github@kaleko.dev>  Wed, 26 Mar 2025 09:47:33 +0000
+
+ssh-tpm-agent (0.7-0) any; urgency=low
+
+  * https://github.com/Foxboron/ssh-tpm-agent/releases/tag/v0.7.0
+
+ -- Kale-Ko <github@kaleko.dev>  Fri, 18 Oct 2024 08:54:10 +0000
+
+ssh-tpm-agent (0.6-0) any; urgency=low
+
+  * https://github.com/Foxboron/ssh-tpm-agent/releases/tag/v0.6.0
+
+ -- Kale-Ko <github@kaleko.dev>  Sat, 10 Aug 2024 02:40:37 +0000
+
+ssh-tpm-agent (0.5-0) any; urgency=low
+
+  * https://github.com/Foxboron/ssh-tpm-agent/releases/tag/v0.5.0
+
+ -- Kale-Ko <github@kaleko.dev>  Sat, 22 Jun 2024 10:18:41 +0000
+
+ssh-tpm-agent (0.4-0) any; urgency=low
+
+  * https://github.com/Foxboron/ssh-tpm-agent/releases/tag/v0.4.0
+
+ -- Kale-Ko <github@kaleko.dev>  Sat, 18 May 2024 23:20:48 +0000
+
+ssh-tpm-agent (0.3-1) any; urgency=low
+
+  * https://github.com/Foxboron/ssh-tpm-agent/releases/tag/v0.3.1
+
+ -- Kale-Ko <github@kaleko.dev>  Sun, 10 Mar 2024 08:40:02 +0000
+
+ssh-tpm-agent (0.3-0) any; urgency=low
+
+  * https://github.com/Foxboron/ssh-tpm-agent/releases/tag/v0.3.0
+
+ -- Kale-Ko <github@kaleko.dev>  Sun, 25 Feb 2024 03:59:38 +0000
+
+ssh-tpm-agent (0.2-0) any; urgency=low
+
+  * https://github.com/Foxboron/ssh-tpm-agent/releases/tag/v0.2.0
+
+ -- Kale-Ko <github@kaleko.dev>  Thu, 19 Oct 2023 07:04:23 +0000
