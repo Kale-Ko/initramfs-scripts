@@ -4,7 +4,7 @@ wireless-initramfs (1.1-0) any; urgency=low
 
  -- Kale-Ko <github@kaleko.dev>  Sun, 20 Apr 2025 12:00:00 -0400
 
-wifi-initramfs (1.0-0) any; urgency=low
+wireless-initramfs (1.0-0) any; urgency=low
 
   * Created package
     - Contains base wireless script
