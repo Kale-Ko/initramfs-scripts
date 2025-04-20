@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+set -o pipefail
 
 PREREQ=""
 prereqs() {
@@ -12,14 +13,22 @@ prereqs)
     ;;
 esac
 
+error_func() {
+    echo "stop-openssh script failed"
+    sleep 3
+}
+trap error_func ERR
+
 . /scripts/functions
 . /scripts/openssh.conf
 
 if grep -qw "openssh" /proc/cmdline; then
-    echo "Killing OpenSSH"
-    kill $(cat /run/initram-openssh.pid)
+    if [ -f /run/initramfs-openssh.pid ]; then
+        echo "Killing OpenSSH"
+        kill $(cat /run/initram-openssh.pid)
 
-    rm -f /run/initram-openssh.pid
+        rm -f /run/initram-openssh.pid
 
-    echo "Killed OpenSSH"
+        echo "Killed OpenSSH"
+    fi
 fi

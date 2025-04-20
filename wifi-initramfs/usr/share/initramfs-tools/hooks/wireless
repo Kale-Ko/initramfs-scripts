@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+set -o pipefail
 
 PREREQ=""
 prereqs() {
@@ -11,6 +12,12 @@ prereqs)
     exit 0
     ;;
 esac
+
+error_func() {
+    echo "wireless hook failed"
+    exit 1
+}
+trap error_func ERR
 
 . /usr/share/initramfs-tools/hook-functions
 

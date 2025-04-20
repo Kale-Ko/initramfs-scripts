@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+set -o pipefail
 
 PREREQ=""
 
@@ -16,6 +17,12 @@ prereqs)
     exit 0
     ;;
 esac
+
+error_func() {
+    echo "start-openssh script failed"
+    panic
+}
+trap error_func ERR
 
 . /scripts/functions
 . /scripts/openssh.conf

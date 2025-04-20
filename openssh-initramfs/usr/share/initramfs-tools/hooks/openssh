@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+set -o pipefail
 
 PREREQ="cryptroot cryptroot-unlock"
 
@@ -16,6 +17,12 @@ prereqs)
     exit 0
     ;;
 esac
+
+error_func() {
+    echo "openssh hook failed"
+    exit 1
+}
+trap error_func ERR
 
 . /usr/share/initramfs-tools/hook-functions
 
