@@ -6,9 +6,12 @@
 !**/debian/install
 !**/debian/postinst
 !**/debian/postrm
+ssh-tpm-agent/debian/install
+!ssh-tpm-agent/debian/install.template
 
 .*
 *.deb
+*.build
 *.buildinfo
 *.changes
 *.dsc

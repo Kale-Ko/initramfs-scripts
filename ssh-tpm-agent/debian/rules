@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_install:
+	sed 's/$${ARCH}/$(DEB_HOST_ARCH)/gi' debian/install.template > debian/install
+	dh_install
+
+override_dh_dwz:
+override_dh_strip:

@@ -1,9 +1,9 @@
 #!/usr/bin/make -f
 
-build: build-wifi build-openssh build-openssh-tpm
+build: build-wireless build-openssh build-openssh-tpm build-ssh-tpm-agent
 
-build-wifi:
-	dpkg-buildpackage wifi-initramfs/
+build-wireless:
+	dpkg-buildpackage wireless-initramfs/
 
 build-openssh: openssh-initramfs/out/cryptroot-unlock-suid
 	dpkg-buildpackage openssh-initramfs/
@@ -15,14 +15,17 @@ openssh-initramfs/out/cryptroot-unlock-suid: openssh-initramfs/cryptroot-unlock-
 build-openssh-tpm:
 	dpkg-buildpackage openssh-tpm-initramfs/
 
-install-default: build-wifi build-openssh
-	sudo dpkg --install $$(cat wifi-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
+build-ssh-tpm-agent: pull-ssh-tpm-agent
+	dpkg-buildpackage ssh-tpm-agent/
 
-install-all: build-wifi build-openssh build-openssh-tpm
-	sudo dpkg --install $$(cat wifi-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-tpm-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
+install-default: build-wireless build-openssh
+	sudo dpkg --install $$(cat wireless-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
 
-install-wifi: build-wifi
-	sudo dpkg --install $$(cat wifi-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
+install-all: build-wireless build-openssh build-openssh-tpm build-ssh-tpm-agent
+	sudo dpkg --install $$(cat wireless-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-tpm-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat ssh-tpm-agent/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
+
+install-wireless: build-wireless
+	sudo dpkg --install $$(cat wireless-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
 
 install-openssh: build-openssh
 	sudo dpkg --install $$(cat openssh-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
@@ -30,30 +33,39 @@ install-openssh: build-openssh
 install-openssh-tpm: build-openssh-tpm
 	sudo dpkg --install $$(cat openssh-tpm-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
 
-clean: clean-wifi clean-openssh clean-openssh-tpm
+install-ssh-tpm-agent: build-ssh-tpm-agent
+	sudo dpkg --install $$(cat ssh-tpm-agent/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
+
+clean: clean-wireless clean-openssh clean-openssh-tpm clean-ssh-tpm-agent
 
 cleanall: clean clean-artifacts
 
-clean-wifi:
-	rm -rf wifi-initramfs/debian/.debhelper wifi-initramfs/debian/debhelper-build-stamp wifi-initramfs/debian/wifi-initramfs wifi-initramfs/debian/files wifi-initramfs/debian/*.substvars
+clean-wireless:
+	rm -rf wireless-initramfs/debian/.debhelper wireless-initramfs/debian/wireless-initramfs.debhelper.log wireless-initramfs/debian/debhelper-build-stamp wireless-initramfs/debian/wireless-initramfs wireless-initramfs/debian/files wireless-initramfs/debian/*.substvars
 
 clean-openssh:
-	rm -rf openssh-initramfs/debian/.debhelper openssh-initramfs/debian/debhelper-build-stamp openssh-initramfs/debian/openssh-initramfs openssh-initramfs/debian/files openssh-initramfs/debian/*.substvars
+	rm -rf openssh-initramfs/debian/.debhelper openssh-initramfs/debian/openssh-initramfs.debhelper.log openssh-initramfs/debian/debhelper-build-stamp openssh-initramfs/debian/openssh-initramfs openssh-initramfs/debian/files openssh-initramfs/debian/*.substvars
 
 clean-openssh-tpm:
-	rm -rf openssh-tpm-initramfs/debian/.debhelper openssh-tpm-initramfs/debian/debhelper-build-stamp openssh-tpm-initramfs/debian/openssh-tpm-initramfs openssh-tpm-initramfs/debian/files openssh-tpm-initramfs/debian/*.substvars
+	rm -rf openssh-tpm-initramfs/debian/.debhelper openssh-tpm-initramfs/debian/openssh-tpm-initramfs.debhelper.log openssh-tpm-initramfs/debian/debhelper-build-stamp openssh-tpm-initramfs/debian/openssh-tpm-initramfs openssh-tpm-initramfs/debian/files openssh-tpm-initramfs/debian/*.substvars
+
+clean-ssh-tpm-agent:
+	rm -rf ssh-tpm-agent/debian/.debhelper ssh-tpm-agent/debian/ssh-tpm-agent.debhelper.log ssh-tpm-agent/debian/debhelper-build-stamp ssh-tpm-agent/debian/ssh-tpm-agent ssh-tpm-agent/debian/files ssh-tpm-agent/debian/*.substvars
 
 clean-artifacts:
 	rm -rf */out/
-	rm -f wifi-initramfs_*.tar.gz wifi-initramfs_*.deb wifi-initramfs_*.buildinfo wifi-initramfs_*.changes wifi-initramfs_*.dsc
+	rm -f wireless-initramfs_*.tar.gz wireless-initramfs_*.deb wireless-initramfs_*.buildinfo wireless-initramfs_*.changes wireless-initramfs_*.dsc
 	rm -f openssh-initramfs_*.tar.gz openssh-initramfs_*.deb openssh-initramfs_*.buildinfo openssh-initramfs_*.changes openssh-initramfs_*.dsc
 	rm -f openssh-tpm-initramfs_*.tar.gz openssh-tpm-initramfs_*.deb openssh-tpm-initramfs_*.buildinfo openssh-tpm-initramfs_*.changes openssh-tpm-initramfs_*.dsc
+	rm -f ssh-tpm-agent_*.tar.gz ssh-tpm-agent_*.deb ssh-tpm-agent_*.buildinfo ssh-tpm-agent_*.changes ssh-tpm-agent_*.dsc
 
-pull-upstream:
+pull-ssh-tpm-agent:
 	curl -sSL https://api.github.com/repos/Foxboron/ssh-tpm-agent/releases/latest -o .ssh-tpm-agent-releases.json
-	curl -sSL $$(cat .ssh-tpm-agent-releases.json | jq -r '.assets[] | select(.name | test("^ssh-tpm-agent-v[0-9.-_]+-linux-amd64\\.tar\\.gz$$")) | .browser_download_url') -o .ssh-tpm-agent.tar.gz
-	rm -rf openssh-tpm-initramfs/usr/share/ssh-tpm-agent/
-	mkdir -p openssh-tpm-initramfs/usr/share/ssh-tpm-agent/
-	tar -xzf .ssh-tpm-agent.tar.gz -C openssh-tpm-initramfs/usr/share/ssh-tpm-agent/ --strip-components 1
-	rm -f .ssh-tpm-agent-releases.json .ssh-tpm-agent.tar.gz
-	find openssh-tpm-initramfs/usr/share/ssh-tpm-agent/ -type f ! -name "LICENSE" -exec strip --strip-all {} \;
+	curl -sSL $$(cat .ssh-tpm-agent-releases.json | jq -r '.assets[] | select(.name | test("^ssh-tpm-agent-v[0-9.-_]+-linux-amd64\\.tar\\.gz$$")) | .browser_download_url') -o .ssh-tpm-agent-amd64.tar.gz
+	curl -sSL $$(cat .ssh-tpm-agent-releases.json | jq -r '.assets[] | select(.name | test("^ssh-tpm-agent-v[0-9.-_]+-linux-arm64\\.tar\\.gz$$")) | .browser_download_url') -o .ssh-tpm-agent-arm64.tar.gz
+	mkdir -p ssh-tpm-agent/usr/bin/amd64/ ssh-tpm-agent/usr/bin/arm64/
+	tar -xzf .ssh-tpm-agent-amd64.tar.gz -C ssh-tpm-agent/usr/bin/amd64/ --strip-components 1 --exclude "LICENSE"
+	tar -xzf .ssh-tpm-agent-arm64.tar.gz -C ssh-tpm-agent/usr/bin/arm64/ --strip-components 1 --exclude "LICENSE"
+	rm -f .ssh-tpm-agent-releases.json .ssh-tpm-agent-amd64.tar.gz .ssh-tpm-agent-arm64.tar.gz
+	find ssh-tpm-agent/usr/bin/amd64 -type f -exec x86_64-linux-gnu-strip --strip-all {} \;
+	find ssh-tpm-agent/usr/bin/arm64 -type f -exec aarch64-linux-gnu-strip --strip-all {} \;

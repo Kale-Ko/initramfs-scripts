@@ -13,6 +13,6 @@ Package: openssh-tpm-initramfs
 Architecture: any
 Section: base
 Priority: optional
-Depends: openssh-initramfs (= 1.0-0), initramfs-tools, openssh-client, openssh-server, cryptsetup, cryptsetup-initramfs
+Depends: ssh-tpm-agent (>= 0.8-0), openssh-initramfs (= 1.0-0), initramfs-tools, openssh-client, openssh-server, cryptsetup, cryptsetup-initramfs
 Description: An initramfs-tools script to allow the OpenSSH server to use a host key from the onboard TPM.
 Homepage: https://github.com/Kale-Ko/initramfs-scripts
