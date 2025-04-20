@@ -22,7 +22,10 @@ error_func() {
     echo "start-openssh script failed"
     panic
 }
-trap error_func ERR
+if ! echo "$*" | grep -qw "trapped"; then
+    $0 $* trapped || error_func
+    exit 0
+fi
 
 . /scripts/functions
 . /scripts/openssh.conf

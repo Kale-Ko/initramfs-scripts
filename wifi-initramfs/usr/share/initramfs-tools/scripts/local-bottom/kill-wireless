@@ -22,7 +22,10 @@ error_func() {
     echo "kill-wireless script failed"
     sleep 3
 }
-trap error_func ERR
+if ! echo "$*" | grep -qw "trapped"; then
+    $0 $* trapped || error_func
+    exit 0
+fi
 
 . /scripts/functions
 . /scripts/wireless.conf

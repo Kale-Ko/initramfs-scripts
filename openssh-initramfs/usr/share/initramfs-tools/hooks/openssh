@@ -22,7 +22,10 @@ error_func() {
     echo "openssh hook failed"
     exit 1
 }
-trap error_func ERR
+if ! echo "$*" | grep -qw "trapped"; then
+    $0 $* trapped || error_func
+    exit 0
+fi
 
 . /usr/share/initramfs-tools/hook-functions
 
