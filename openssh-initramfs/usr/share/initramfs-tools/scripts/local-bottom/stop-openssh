@@ -28,7 +28,9 @@ fi
 
 if grep -qw "openssh" /proc/cmdline; then
     echo "Killing OpenSSH"
-    kill $(cat /run/initram-openssh.pid)
+
+    pid=$(cat /run/initram-openssh.pid)
+    kill ${pid} $(ps -eo ppid,pid | grep -E "^[ \t]*${pid}[ \t]+" | awk '{ print $2 }')
 
     rm -f /run/initram-openssh.pid
 
