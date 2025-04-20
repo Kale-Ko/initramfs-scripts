@@ -16,6 +16,7 @@ esac
 error_func() {
     echo "stop-openssh script failed"
     sleep 3
+    exit 1
 }
 if ! echo "$*" | grep -qw "trapped"; then
     $0 $* trapped || error_func
@@ -26,12 +27,10 @@ fi
 . /scripts/openssh.conf
 
 if grep -qw "openssh" /proc/cmdline; then
-    if [ -f /run/initramfs-openssh.pid ]; then
-        echo "Killing OpenSSH"
-        kill $(cat /run/initram-openssh.pid)
+    echo "Killing OpenSSH"
+    kill $(cat /run/initram-openssh.pid)
 
-        rm -f /run/initram-openssh.pid
+    rm -f /run/initram-openssh.pid
 
-        echo "Killed OpenSSH"
-    fi
+    echo "Killed OpenSSH"
 fi
