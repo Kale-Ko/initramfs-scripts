@@ -1,5 +1,5 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: wifi-initramfs
+Upstream-Name: wireless-initramfs
 Upstream-Contact: Kale-Ko <contact@kaleko.dev>
 Source: https://github.com/Kale-Ko/initramfs-scripts
 

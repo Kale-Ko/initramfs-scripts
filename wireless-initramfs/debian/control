@@ -1,4 +1,4 @@
-Source: wifi-initramfs
+Source: wireless-initramfs
 Section: base
 Priority: optional
 Build-Depends: debhelper-compat (= 13)
@@ -9,7 +9,7 @@ VCS-git: git://github.com/Kale-Ko/initramfs-scripts.git
 Maintainer: Kale-Ko <github@kaleko.dev>
 
 Package-Type: deb
-Package: wifi-initramfs
+Package: wireless-initramfs
 Architecture: any
 Section: base
 Priority: optional
