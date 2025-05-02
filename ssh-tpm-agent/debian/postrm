@@ -1,0 +1,27 @@
+#!/bin/sh
+
+systemctl_global() {
+    systemctl --user --global $*
+}
+
+systemctl_users() {
+    for user in $(loginctl list-users | tail -n "+2" | head -n "-2" | awk '{print $2}' | sort -u); do
+        su $user -c "systemctl --user $*"
+    done
+}
+
+systemctl_active_users() {
+    for user in $(loginctl list-sessions | tail -n "+2" | head -n "-2" | awk '{print $3}' | sort -u); do
+        su $user -c "systemctl --user $*"
+    done
+}
+
+systemctl_all() {
+    systemctl_global $*
+    ret=$?
+    systemctl_users $*
+    return $ret
+}
+
+systemctl daemon-reload
+systemctl_active_users daemon-reload
