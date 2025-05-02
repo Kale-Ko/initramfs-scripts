@@ -1,1 +1,3 @@
+usr/bin/helper/* usr/bin/
 usr/bin/${ARCH}/* usr/bin/
+usr/lib/systemd/* usr/lib/systemd/

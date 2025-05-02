@@ -13,5 +13,6 @@ Package: ssh-tpm-agent
 Architecture: amd64 arm64
 Section: base
 Priority: optional
-Description: ssh-agent for TPMs.
+Depends: systemd, dbus, openssh-client, openssh-server
+Description: ssh-agent for TPMs
 Homepage: https://github.com/Foxboron/ssh-tpm-agent

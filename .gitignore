@@ -4,7 +4,9 @@
 !**/debian/copyright
 !**/debian/rules
 !**/debian/install
+!**/debian/preinst
 !**/debian/postinst
+!**/debian/prerm
 !**/debian/postrm
 ssh-tpm-agent/debian/install
 !ssh-tpm-agent/debian/install.template
@@ -17,5 +19,7 @@ ssh-tpm-agent/debian/install
 *.dsc
 *.asc
 *.tar.gz
+*.new
+*.new.*
 
 out/

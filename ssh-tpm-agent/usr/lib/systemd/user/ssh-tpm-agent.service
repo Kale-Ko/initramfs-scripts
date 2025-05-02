@@ -1,0 +1,17 @@
+[Unit]
+Description=ssh-tpm-agent
+Before=graphical-session-pre.target
+Wants=dbus.socket
+Requires=ssh-default-agent.service
+After=dbus.socket ssh-default-agent.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh-tpm-agent -l "%t/ssh-tpm-agent.sock" -A "%t/ssh-agent.sock" --key-dir "%h/.ssh/"
+ExecStartPost=/usr/bin/update-env-helper set 10 "SSH_AUTH_SOCK=%t/ssh-tpm-agent.sock"
+ExecStopPost=/usr/bin/update-env-helper unset "SSH_AUTH_SOCK=%t/ssh-tpm-agent.sock"
+Restart=on-failure
+
+[Install]
+Also=ssh-default-agent.service
+WantedBy=multi-user.target

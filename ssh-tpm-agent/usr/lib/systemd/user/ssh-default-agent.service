@@ -1,0 +1,16 @@
+[Unit]
+Description=ssh-agent
+Before=graphical-session-pre.target
+Wants=dbus.socket
+After=dbus.socket
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh-agent -D -a "%t/ssh-agent.sock"
+ExecStartPost=/usr/bin/update-env-helper set 5 "SSH_AUTH_SOCK=%t/ssh-agent.sock"
+ExecStopPost=/usr/bin/update-env-helper unset "SSH_AUTH_SOCK=%t/ssh-agent.sock"
+SuccessExitStatus=2
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
