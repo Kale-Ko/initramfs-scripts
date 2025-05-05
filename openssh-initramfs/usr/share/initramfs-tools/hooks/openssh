@@ -32,6 +32,9 @@ fi
 copy_file config /etc/initramfs-tools/conf.d/openssh /scripts/openssh.conf
 
 copy_exec /bin/ssh
+copy_exec /bin/ssh-agent
+copy_exec /bin/ssh-askpass
+copy_exec /bin/ssh-add
 copy_exec /sbin/sshd
 
 for file in /lib/openssh/*; do
@@ -78,12 +81,22 @@ AcceptEnv LANG LC_*
 EOF
 fi
 
-if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_host_*key >/dev/null 2>&1; then
-    if [ ${OPENSSH_GENERATE_SERVER_KEYS} = "true" ]; then
-        echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new keys."
+if stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_tpm_host_*key* >/dev/null 2>&1; then
+    copy_exec /bin/ssh-tpm-agent
+    copy_exec /bin/ssh-tpm-add
+elif ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_host_*key >/dev/null 2>&1; then
+    if [ ${OPENSSH_GENERATE_SERVER_KEYS} = "true" ] || [ ${OPENSSH_GENERATE_SERVER_KEYS} = "standard" ]; then
+        echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new standard keys."
 
         mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
         ssh-keygen -Ah -f /tmp/initramfs-ssh/ -N ""
+        cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
+        rm -rf /tmp/initramfs-ssh/
+    elif [ ${OPENSSH_GENERATE_SERVER_KEYS} = "tpm" ]; then
+        echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new tpm keys."
+
+        mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
+        ssh-tpm-keygen -A -f /tmp/initramfs-ssh/ -N ""
         cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
         rm -rf /tmp/initramfs-ssh/
     else
