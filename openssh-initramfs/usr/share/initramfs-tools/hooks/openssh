@@ -22,37 +22,35 @@ esac
 
 error_func() {
     echo "openssh hook failed"
+    sleep 1
     exit 1
 }
-if ! echo "$*" | grep -qw "trapped"; then
-    $0 $* trapped || error_func
-    exit 0
-fi
 
-copy_file config /etc/initramfs-tools/conf.d/openssh /scripts/openssh.conf
+main() {
+    copy_file config /etc/initramfs-tools/conf.d/openssh /scripts/openssh.conf
 
-copy_exec /bin/ssh
-copy_exec /bin/ssh-agent
-copy_exec /bin/ssh-askpass
-copy_exec /bin/ssh-add
-copy_exec /sbin/sshd
+    copy_exec /bin/ssh
+    copy_exec /bin/ssh-agent
+    copy_exec /bin/ssh-askpass
+    copy_exec /bin/ssh-add
+    copy_exec /sbin/sshd
 
-for file in /lib/openssh/*; do
-    copy_exec $file
-done
+    for file in /lib/openssh/*; do
+        copy_exec $file
+    done
 
-cp $DESTDIR/bin/cryptroot-unlock $DESTDIR/scripts/cryptroot-unlock
-chown root:root $DESTDIR/scripts/cryptroot-unlock
-chmod 0755 $DESTDIR/scripts/cryptroot-unlock
+    cp $DESTDIR/bin/cryptroot-unlock $DESTDIR/scripts/cryptroot-unlock
+    chown root:root $DESTDIR/scripts/cryptroot-unlock
+    chmod 0755 $DESTDIR/scripts/cryptroot-unlock
 
-copy_exec /usr/share/initramfs-tools/scripts/cryptroot-unlock-suid /scripts/cryptroot-unlock-suid
-chown root:root $DESTDIR/scripts/cryptroot-unlock-suid
-chmod 6755 $DESTDIR/scripts/cryptroot-unlock-suid
+    copy_exec /usr/share/initramfs-tools/scripts/cryptroot-unlock-suid /scripts/cryptroot-unlock-suid
+    chown root:root $DESTDIR/scripts/cryptroot-unlock-suid
+    chmod 6755 $DESTDIR/scripts/cryptroot-unlock-suid
 
-mkdir -p ${OPENSSH_CONFIG_DIRECTORY}/
+    mkdir -p ${OPENSSH_CONFIG_DIRECTORY}/
 
-if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/sshd_config >/dev/null 2>&1; then
-    cat >${OPENSSH_CONFIG_DIRECTORY}/sshd_config <<EOF
+    if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/sshd_config >/dev/null 2>&1; then
+        cat >${OPENSSH_CONFIG_DIRECTORY}/sshd_config <<EOF
 # This is not a complete configuration, for a complete list of options see sshd_config(5).
 
 AddressFamily any
@@ -79,80 +77,83 @@ Banner none
 
 AcceptEnv LANG LC_*
 EOF
-fi
-
-if stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_tpm_host_*key* >/dev/null 2>&1; then
-    copy_exec /bin/ssh-tpm-agent
-    copy_exec /bin/ssh-tpm-add
-elif ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_host_*key >/dev/null 2>&1; then
-    if [ ${OPENSSH_GENERATE_SERVER_KEYS} = "true" ] || [ ${OPENSSH_GENERATE_SERVER_KEYS} = "standard" ]; then
-        echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new standard keys."
-
-        mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
-        ssh-keygen -Ah -f /tmp/initramfs-ssh/ -N ""
-        cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
-        rm -rf /tmp/initramfs-ssh/
-    elif [ ${OPENSSH_GENERATE_SERVER_KEYS} = "tpm" ]; then
-        echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new tpm keys."
-
-        mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
-        ssh-tpm-keygen -A -f /tmp/initramfs-ssh/ -N ""
-        cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
-        rm -rf /tmp/initramfs-ssh/
-    else
-        echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY} and OPENSSH_GENERATE_SERVER_KEYS is set to false."
-        exit 1
     fi
-fi
 
-if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/moduli >/dev/null 2>&1; then
-    if [ -f /etc/ssh/moduli ]; then
-        cp /etc/ssh/moduli ${OPENSSH_CONFIG_DIRECTORY}
-    else
-        echo "SSH moduli file does not exist in ${OPENSSH_CONFIG_DIRECTORY} or /etc/ssh/."
-        exit 1
+    if stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_tpm_host_*key* >/dev/null 2>&1; then
+        copy_exec /bin/ssh-tpm-agent
+        copy_exec /bin/ssh-tpm-add
+    elif ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_host_*key >/dev/null 2>&1; then
+        if [ ${OPENSSH_GENERATE_SERVER_KEYS} = "true" ] || [ ${OPENSSH_GENERATE_SERVER_KEYS} = "standard" ]; then
+            echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new standard keys."
+
+            mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
+            ssh-keygen -Ah -f /tmp/initramfs-ssh/ -N ""
+            cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
+            rm -rf /tmp/initramfs-ssh/
+        elif [ ${OPENSSH_GENERATE_SERVER_KEYS} = "tpm" ]; then
+            echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new tpm keys."
+
+            mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
+            ssh-tpm-keygen -A -f /tmp/initramfs-ssh/ -N ""
+            cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
+            rm -rf /tmp/initramfs-ssh/
+        else
+            echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY} and OPENSSH_GENERATE_SERVER_KEYS is set to false."
+            return 1
+        fi
     fi
-fi
 
-for file in ${OPENSSH_CONFIG_DIRECTORY}/*; do
-    if [ ! -e ${OPENSSH_AUTHORIZED_KEYS_FILE} ] || [ $(realpath $file) != $(realpath ${OPENSSH_AUTHORIZED_KEYS_FILE}) ]; then
-        copy_file config $file /etc/ssh/
+    if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/moduli >/dev/null 2>&1; then
+        if [ -f /etc/ssh/moduli ]; then
+            cp /etc/ssh/moduli ${OPENSSH_CONFIG_DIRECTORY}
+        else
+            echo "SSH moduli file does not exist in ${OPENSSH_CONFIG_DIRECTORY} or /etc/ssh/."
+            return 1
+        fi
     fi
-done
 
-cat >/tmp/initramfs-passwd <<EOF
+    for file in ${OPENSSH_CONFIG_DIRECTORY}/*; do
+        if [ ! -e ${OPENSSH_AUTHORIZED_KEYS_FILE} ] || [ $(realpath $file) != $(realpath ${OPENSSH_AUTHORIZED_KEYS_FILE}) ]; then
+            copy_file config $file /etc/ssh/
+        fi
+    done
+
+    cat >/tmp/initramfs-passwd <<EOF
 root:*:0:0:root:/tmp/initramfs-root:/bin/sh
 sshd:*:100:65534::/run/sshd:/sbin/nologin
 EOF
-cat >/tmp/initramfs-group <<EOF
+    cat >/tmp/initramfs-group <<EOF
 root:*:0:
 EOF
-mkdir -p $DESTDIR/tmp/initramfs-root $DESTDIR/run/sshd
-chown root:root -R $DESTDIR/tmp/initramfs-root $DESTDIR/run/sshd
+    mkdir -p $DESTDIR/tmp/initramfs-root $DESTDIR/run/sshd
+    chown root:root -R $DESTDIR/tmp/initramfs-root $DESTDIR/run/sshd
 
-home=/tmp/initramfs-root
+    home=/tmp/initramfs-root
 
-if [ ${OPENSSH_AUTHORIZED_USER} != "root" ]; then
-    cat >>/tmp/initramfs-passwd <<EOF
+    if [ ${OPENSSH_AUTHORIZED_USER} != "root" ]; then
+        cat >>/tmp/initramfs-passwd <<EOF
 ${OPENSSH_AUTHORIZED_USER}:*:1000:1000:${OPENSSH_AUTHORIZED_USER}:/tmp/initramfs-user:/bin/sh
 EOF
-    cat >>/tmp/initramfs-group <<EOF
+        cat >>/tmp/initramfs-group <<EOF
 ${OPENSSH_AUTHORIZED_USER}:*:1000:
 EOF
-    mkdir -p $DESTDIR/tmp/initramfs-user
-    chown ${OPENSSH_AUTHORIZED_USER}:${OPENSSH_AUTHORIZED_USER} -R $DESTDIR/tmp/initramfs-user
+        mkdir -p $DESTDIR/tmp/initramfs-user
+        chown ${OPENSSH_AUTHORIZED_USER}:${OPENSSH_AUTHORIZED_USER} -R $DESTDIR/tmp/initramfs-user
 
-    home=/tmp/initramfs-user
-fi
+        home=/tmp/initramfs-user
+    fi
 
-if stat -t ${OPENSSH_AUTHORIZED_KEYS_FILE} >/dev/null 2>&1; then
-    mkdir -p $DESTDIR/$home/.ssh/
-    copy_file config ${OPENSSH_AUTHORIZED_KEYS_FILE} $home/.ssh/authorized_keys
-else
-    echo "SSH authorized_keys file ${OPENSSH_AUTHORIZED_KEYS_FILE} does not exist."
-    exit 1
-fi
+    if stat -t ${OPENSSH_AUTHORIZED_KEYS_FILE} >/dev/null 2>&1; then
+        mkdir -p $DESTDIR/$home/.ssh/
+        copy_file config ${OPENSSH_AUTHORIZED_KEYS_FILE} $home/.ssh/authorized_keys
+    else
+        echo "SSH authorized_keys file ${OPENSSH_AUTHORIZED_KEYS_FILE} does not exist."
+        return 1
+    fi
 
-rm -f $DESTDIR/etc/passwd $DESTDIR/etc/group
-copy_file config /tmp/initramfs-passwd /etc/passwd
-copy_file config /tmp/initramfs-group /etc/group
+    rm -f $DESTDIR/etc/passwd $DESTDIR/etc/group
+    copy_file config /tmp/initramfs-passwd /etc/passwd
+    copy_file config /tmp/initramfs-group /etc/group
+}
+
+main $* || error_func
