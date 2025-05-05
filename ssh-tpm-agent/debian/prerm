@@ -29,3 +29,8 @@ systemctl_all disable ssh-default-agent.service ssh-tpm-agent.service >/dev/null
 systemctl_active_users stop ssh-default-agent.service ssh-tpm-agent.service >/dev/null 2>&1 || true
 
 (systemctl_all enable gcr-ssh-agent.socket gcr-ssh-agent.service >/dev/null 2>&1 && systemctl_active_users restart gcr-ssh-agent.socket gcr-ssh-agent.service >/dev/null 2>&1) || (systemctl_all enable ssh-agent.socket ssh-agent.service >/dev/null 2>&1 && systemctl_active_users restart ssh-agent.socket ssh-agent.service >/dev/null 2>&1) || true
+
+echo "Disabling sshd-tpm-agent"
+
+systemctl disable sshd-default-agent.service sshd-tpm-agent.service >/dev/null 2>&1 || true
+systemctl stop sshd-default-agent.service sshd-tpm-agent.service >/dev/null 2>&1

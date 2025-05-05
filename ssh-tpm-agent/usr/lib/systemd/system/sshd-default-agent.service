@@ -1,0 +1,12 @@
+[Unit]
+Description=ssh-agent for sshd
+Before=ssh.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh-agent -D -a "%t/ssh-agent.sock"
+SuccessExitStatus=2
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target ssh.service

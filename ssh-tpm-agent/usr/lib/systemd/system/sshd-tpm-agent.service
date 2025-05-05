@@ -1,0 +1,14 @@
+[Unit]
+Description=ssh-tpm-agent for sshd
+Before=ssh.service
+Requires=sshd-default-agent.service
+After=sshd-default-agent.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh-tpm-agent -l "%t/ssh-tpm-agent.sock" -A "%t/ssh-agent.sock" --key-dir "/etc/ssh/"
+Restart=on-failure
+
+[Install]
+Also=sshd-default-agent.service
+WantedBy=multi-user.target ssh.service

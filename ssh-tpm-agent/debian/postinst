@@ -26,6 +26,11 @@ systemctl_all() {
 systemctl daemon-reload
 systemctl_active_users daemon-reload
 
+echo "Enabling sshd-tpm-agent"
+
+systemctl enable sshd-default-agent.service sshd-tpm-agent.service >/dev/null 2>&1 || true
+systemctl restart sshd-default-agent.service sshd-tpm-agent.service >/dev/null 2>&1
+
 echo "Disabling default ssh-agent and enabling ssh-tpm-agent..."
 
 (systemctl_all disable ssh-agent.socket ssh-agent.service >/dev/null 2>&1 && systemctl_active_users stop ssh-agent.socket ssh-agent.service >/dev/null 2>&1) || true
