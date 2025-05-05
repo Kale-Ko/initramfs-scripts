@@ -13,6 +13,8 @@ prereqs)
     ;;
 esac
 
+. /scripts/functions
+
 error_func() {
     echo "enable-wireless script failed"
     panic
@@ -23,7 +25,6 @@ if ! echo "$*" | grep -qw "trapped"; then
     exit 0
 fi
 
-. /scripts/functions
 . /scripts/wireless.conf
 
 AUTH_LIMIT=30

@@ -13,6 +13,8 @@ prereqs)
     ;;
 esac
 
+. /scripts/functions
+
 error_func() {
     echo "stop-openssh script failed"
     sleep 3
@@ -23,7 +25,6 @@ if ! echo "$*" | grep -qw "trapped"; then
     exit 0
 fi
 
-. /scripts/functions
 . /scripts/openssh.conf
 
 if grep -qw "openssh" /proc/cmdline; then

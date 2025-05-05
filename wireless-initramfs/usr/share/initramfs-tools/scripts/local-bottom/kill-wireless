@@ -18,6 +18,8 @@ prereqs)
     ;;
 esac
 
+. /scripts/functions
+
 error_func() {
     echo "kill-wireless script failed"
     sleep 3
@@ -28,7 +30,6 @@ if ! echo "$*" | grep -qw "trapped"; then
     exit 0
 fi
 
-. /scripts/functions
 . /scripts/wireless.conf
 
 if grep -qw "wireless" /proc/cmdline; then

@@ -18,6 +18,8 @@ prereqs)
     ;;
 esac
 
+. /usr/share/initramfs-tools/hook-functions
+
 error_func() {
     echo "openssh hook failed"
     exit 1
@@ -26,8 +28,6 @@ if ! echo "$*" | grep -qw "trapped"; then
     $0 $* trapped || error_func
     exit 0
 fi
-
-. /usr/share/initramfs-tools/hook-functions
 
 copy_file config /etc/initramfs-tools/conf.d/openssh /scripts/openssh.conf
 
