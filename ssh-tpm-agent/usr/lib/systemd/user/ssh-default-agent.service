@@ -3,7 +3,6 @@ Description=ssh-agent
 Before=graphical-session-pre.target
 Wants=dbus.socket
 After=dbus.socket
-Before=graphical-session-pre.target
 
 [Service]
 Type=simple
