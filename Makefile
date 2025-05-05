@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-build: build-wireless build-openssh build-openssh-tpm build-ssh-tpm-agent
+build: build-wireless build-openssh build-ssh-tpm-agent
 
 build-wireless:
 	dpkg-buildpackage wireless-initramfs/
@@ -12,17 +12,14 @@ openssh-initramfs/out/cryptroot-unlock-suid: openssh-initramfs/cryptroot-unlock-
 	mkdir -p openssh-initramfs/out/
 	g++ -O3 -s openssh-initramfs/cryptroot-unlock-suid.cpp -o openssh-initramfs/out/cryptroot-unlock-suid
 
-build-openssh-tpm:
-	dpkg-buildpackage openssh-tpm-initramfs/
-
-build-ssh-tpm-agent: pull-ssh-tpm-agent
+build-ssh-tpm-agent:
 	dpkg-buildpackage ssh-tpm-agent/
 
 install-default: build-wireless build-openssh
 	sudo dpkg --install $$(cat wireless-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
 
-install-all: build-wireless build-openssh build-openssh-tpm build-ssh-tpm-agent
-	sudo dpkg --install $$(cat wireless-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-tpm-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat ssh-tpm-agent/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
+install-all: build-wireless build-openssh build-ssh-tpm-agent
+	sudo dpkg --install $$(cat wireless-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat ssh-tpm-agent/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
 
 install-wireless: build-wireless
 	sudo dpkg --install $$(cat wireless-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
@@ -30,13 +27,10 @@ install-wireless: build-wireless
 install-openssh: build-openssh
 	sudo dpkg --install $$(cat openssh-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
 
-install-openssh-tpm: build-openssh-tpm
-	sudo dpkg --install $$(cat openssh-tpm-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
-
 install-ssh-tpm-agent: build-ssh-tpm-agent
 	sudo dpkg --install $$(cat ssh-tpm-agent/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
 
-clean: clean-wireless clean-openssh clean-openssh-tpm clean-ssh-tpm-agent
+clean: clean-wireless clean-openssh clean-ssh-tpm-agent
 
 cleanall: clean clean-artifacts
 
@@ -46,9 +40,6 @@ clean-wireless:
 clean-openssh:
 	rm -rf openssh-initramfs/debian/.debhelper openssh-initramfs/debian/openssh-initramfs.debhelper.log openssh-initramfs/debian/debhelper-build-stamp openssh-initramfs/debian/openssh-initramfs openssh-initramfs/debian/files openssh-initramfs/debian/*.substvars
 
-clean-openssh-tpm:
-	rm -rf openssh-tpm-initramfs/debian/.debhelper openssh-tpm-initramfs/debian/openssh-tpm-initramfs.debhelper.log openssh-tpm-initramfs/debian/debhelper-build-stamp openssh-tpm-initramfs/debian/openssh-tpm-initramfs openssh-tpm-initramfs/debian/files openssh-tpm-initramfs/debian/*.substvars
-
 clean-ssh-tpm-agent:
 	rm -rf ssh-tpm-agent/debian/.debhelper ssh-tpm-agent/debian/ssh-tpm-agent.debhelper.log ssh-tpm-agent/debian/debhelper-build-stamp ssh-tpm-agent/debian/ssh-tpm-agent ssh-tpm-agent/debian/files ssh-tpm-agent/debian/*.substvars
 
@@ -56,7 +47,6 @@ clean-artifacts:
 	rm -rf */out/
 	rm -f wireless-initramfs_*.tar.gz wireless-initramfs_*.deb wireless-initramfs_*.buildinfo wireless-initramfs_*.changes wireless-initramfs_*.dsc
 	rm -f openssh-initramfs_*.tar.gz openssh-initramfs_*.deb openssh-initramfs_*.buildinfo openssh-initramfs_*.changes openssh-initramfs_*.dsc
-	rm -f openssh-tpm-initramfs_*.tar.gz openssh-tpm-initramfs_*.deb openssh-tpm-initramfs_*.buildinfo openssh-tpm-initramfs_*.changes openssh-tpm-initramfs_*.dsc
 	rm -f ssh-tpm-agent_*.tar.gz ssh-tpm-agent_*.deb ssh-tpm-agent_*.buildinfo ssh-tpm-agent_*.changes ssh-tpm-agent_*.dsc
 
 pull-ssh-tpm-agent:
