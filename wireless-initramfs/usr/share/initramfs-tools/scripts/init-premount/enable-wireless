@@ -17,43 +17,44 @@ esac
 
 error_func() {
     echo "enable-wireless script failed"
+    sleep 1
     panic
-    exit 1
+    sleep INF
 }
-if ! echo "$*" | grep -qw "trapped"; then
-    $0 $* trapped || error_func
-    exit 0
-fi
 
-. /scripts/wireless.conf
+main() {
+    . /scripts/wireless.conf
 
-AUTH_LIMIT=30
+    AUTH_LIMIT=30
 
-if grep -qw "wireless" /proc/cmdline; then
-    WPA_COMMAND="/sbin/wpa_cli -p /run/initram-wpa_supplicant_interface -i ${WIRELESS_INTERFACE}"
+    if grep -qw "wireless" /proc/cmdline; then
+        WPA_COMMAND="/sbin/wpa_cli -p /run/initram-wpa_supplicant_interface -i ${WIRELESS_INTERFACE}"
 
-    echo "Starting wireless connection on ${WIRELESS_INTERFACE}"
-    /sbin/wpa_supplicant -B -i ${WIRELESS_INTERFACE} -c /etc/wpa_supplicant.conf -P /run/initram-wpa_supplicant.pid -f /tmp/initram-wpa_supplicant.log
+        echo "Starting wireless connection on ${WIRELESS_INTERFACE}"
+        /sbin/wpa_supplicant -B -i ${WIRELESS_INTERFACE} -c /etc/wpa_supplicant.conf -P /run/initram-wpa_supplicant.pid -f /tmp/initram-wpa_supplicant.log
 
-    limit=${AUTH_LIMIT}
-    echo "Waiting for connection (max ${AUTH_LIMIT} seconds)"
-    while [ $limit -ge 0 -a "$($WPA_COMMAND status | grep wpa_state)" != "wpa_state=COMPLETED" ]; do
-        echo -n "."
-        sleep 1
-        limit=$(expr $limit - 1)
-    done
-    echo ""
+        limit=${AUTH_LIMIT}
+        echo "Waiting for connection (max ${AUTH_LIMIT} seconds)"
+        while [ $limit -ge 0 -a "$($WPA_COMMAND status | grep wpa_state)" != "wpa_state=COMPLETED" ]; do
+            echo -n "."
+            sleep 1
+            limit=$(expr $limit - 1)
+        done
+        echo ""
 
-    if [ "$($WPA_COMMAND status | grep wpa_state)" != "wpa_state=COMPLETED" ]; then
-        export ONLINE=0
-        echo "Wireless offline after timeout"
-        panic
-    else
-        export ONLINE=1
-        echo "Wireless online"
+        if [ "$($WPA_COMMAND status | grep wpa_state)" != "wpa_state=COMPLETED" ]; then
+            export ONLINE=0
+            echo "Wireless offline after timeout"
+            return 1
+        else
+            export ONLINE=1
+            echo "Wireless online"
+        fi
+
+        configure_networking
+
+        echo "Wireless configured"
     fi
+}
 
-    configure_networking
-
-    echo "Wireless configured"
-fi
+main $* || error_func

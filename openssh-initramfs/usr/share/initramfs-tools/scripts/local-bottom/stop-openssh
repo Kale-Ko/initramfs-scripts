@@ -18,13 +18,9 @@ esac
 error_func() {
     echo "stop-openssh script failed"
     sleep 3
-    exit 1
 }
-if ! echo "$*" | grep -qw "trapped"; then
-    $0 $* trapped || error_func
-    exit 0
-fi
 
+main() {
 . /scripts/openssh.conf
 
 if grep -qw "openssh" /proc/cmdline; then
@@ -37,3 +33,6 @@ if grep -qw "openssh" /proc/cmdline; then
 
     echo "Killed OpenSSH"
 fi
+}
+
+main $* || error_func

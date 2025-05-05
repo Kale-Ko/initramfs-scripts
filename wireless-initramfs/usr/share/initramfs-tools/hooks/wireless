@@ -17,20 +17,18 @@ esac
 
 error_func() {
     echo "wireless hook failed"
+    sleep 1
     exit 1
 }
-if ! echo "$*" | grep -qw "trapped"; then
-    $0 $* trapped || error_func
-    exit 0
-fi
 
-copy_file config /etc/initramfs-tools/conf.d/wireless /scripts/wireless.conf
+main() {
+    copy_file config /etc/initramfs-tools/conf.d/wireless /scripts/wireless.conf
 
-manual_add_modules ${WIRELESS_MODULES}
-copy_exec /sbin/wpa_supplicant
-copy_exec /sbin/wpa_cli
+    manual_add_modules ${WIRELESS_MODULES}
+    copy_exec /sbin/wpa_supplicant
+    copy_exec /sbin/wpa_cli
 
-cat >/tmp/initramfs-wpa_supplicant.conf <<EOF
+    cat >/tmp/initramfs-wpa_supplicant.conf <<EOF
 ctrl_interface=/run/initram-wpa_supplicant_interface
 
 network={
@@ -40,5 +38,8 @@ network={
     psk="${WIRELESS_PASSWORD}"
 }
 EOF
-copy_file config /tmp/initramfs-wpa_supplicant.conf /etc/wpa_supplicant.conf
-rm /tmp/initramfs-wpa_supplicant.conf
+    copy_file config /tmp/initramfs-wpa_supplicant.conf /etc/wpa_supplicant.conf
+    rm /tmp/initramfs-wpa_supplicant.conf
+}
+
+main $* || error_func

@@ -22,14 +22,12 @@ esac
 
 error_func() {
     echo "start-openssh script failed"
+    sleep 1
     panic
-    exit 1
+    sleep INF
 }
-if ! echo "$*" | grep -qw "trapped"; then
-    $0 $* trapped || error_func
-    exit 0
-fi
 
+main() {
 . /scripts/openssh.conf
 
 if grep -qw "openssh" /proc/cmdline; then
@@ -53,3 +51,6 @@ if grep -qw "openssh" /proc/cmdline; then
     /sbin/sshd -D -o PidFile=/run/initram-openssh.pid $ports -f /etc/ssh/sshd_config $keys &
     echo "Started OpenSSH server"
 fi
+}
+
+main $* || error_func

@@ -23,21 +23,20 @@ esac
 error_func() {
     echo "kill-wireless script failed"
     sleep 3
-    exit 1
 }
-if ! echo "$*" | grep -qw "trapped"; then
-    $0 $* trapped || error_func
-    exit 0
-fi
 
-. /scripts/wireless.conf
+main() {
+    . /scripts/wireless.conf
 
-if grep -qw "wireless" /proc/cmdline; then
-    echo "Killing wireless"
-    kill $(cat /run/initram-wpa_supplicant.pid)
+    if grep -qw "wireless" /proc/cmdline; then
+        echo "Killing wireless"
+        kill $(cat /run/initram-wpa_supplicant.pid)
 
-    rm -rf /run/initram-wpa_supplicant_interface
-    rm -f /run/initram-wpa_supplicant.pid
+        rm -rf /run/initram-wpa_supplicant_interface
+        rm -f /run/initram-wpa_supplicant.pid
 
-    echo "Killed wireless"
-fi
+        echo "Killed wireless"
+    fi
+}
+
+main $* || error_func
