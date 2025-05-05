@@ -3,6 +3,7 @@ Description=ssh-agent
 Before=graphical-session-pre.target
 Wants=dbus.socket
 After=dbus.socket
+Before=graphical-session-pre.target
 
 [Service]
 Type=simple
@@ -13,4 +14,4 @@ SuccessExitStatus=2
 Restart=on-failure
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
