@@ -4,6 +4,7 @@ Before=graphical-session-pre.target
 Wants=dbus.socket
 Requires=ssh-default-agent.service
 After=dbus.socket ssh-default-agent.service
+Before=graphical-session-pre.target
 
 [Service]
 Type=simple
@@ -14,4 +15,4 @@ Restart=on-failure
 
 [Install]
 Also=ssh-default-agent.service
-WantedBy=multi-user.target
+WantedBy=default.target
