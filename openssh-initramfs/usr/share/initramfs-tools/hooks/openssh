@@ -36,7 +36,15 @@ main() {
     copy_exec /sbin/sshd
 
     for file in /lib/openssh/*; do
-        copy_exec $file
+        if [ -e "$file" ]; then
+            copy_exec $file
+        fi
+    done
+
+    for file in /lib/libnss_files* /lib/$(dpkg-architecture -qDEB_HOST_GNU_TYPE)/libnss_files*; do
+        if [ -e "$file" ]; then
+            copy_exec $file
+        fi
     done
 
     cp $DESTDIR/bin/cryptroot-unlock $DESTDIR/scripts/cryptroot-unlock
@@ -113,10 +121,17 @@ EOF
     fi
 
     for file in ${OPENSSH_CONFIG_DIRECTORY}/*; do
-        if [ ! -e ${OPENSSH_AUTHORIZED_KEYS_FILE} ] || [ $(realpath $file) != $(realpath ${OPENSSH_AUTHORIZED_KEYS_FILE}) ]; then
+        if [ -e "$file" ] && ([ ! -e ${OPENSSH_AUTHORIZED_KEYS_FILE} ] || [ $(realpath $file) != $(realpath ${OPENSSH_AUTHORIZED_KEYS_FILE}) ]); then
             copy_file config $file /etc/ssh/
         fi
     done
+
+    cat >/tmp/initramfs-nsswitch.conf <<EOF
+passwd: files
+group:  files
+EOF
+    rm -f $DESTDIR/etc/nsswitch.conf # TODO Play nice with other scripts
+    copy_file nsswitch.conf /tmp/initramfs-nsswitch.conf /etc/nsswitch.conf
 
     cat >/tmp/initramfs-passwd <<EOF
 root:*:0:0:root:/tmp/initramfs-root:/bin/sh
@@ -143,17 +158,18 @@ EOF
         home=/tmp/initramfs-user
     fi
 
+    rm -f $DESTDIR/etc/passwd $DESTDIR/etc/group # TODO Play nice with other scripts
+    copy_file passwd /tmp/initramfs-passwd /etc/passwd
+    copy_file group /tmp/initramfs-group /etc/group
+    rm -f /tpm/initramfs-passwd /tpm/initramfs-group
+
     if stat -t ${OPENSSH_AUTHORIZED_KEYS_FILE} >/dev/null 2>&1; then
         mkdir -p $DESTDIR/$home/.ssh/
-        copy_file config ${OPENSSH_AUTHORIZED_KEYS_FILE} $home/.ssh/authorized_keys
+        copy_file authorized_keys ${OPENSSH_AUTHORIZED_KEYS_FILE} $home/.ssh/authorized_keys
     else
         echo "SSH authorized_keys file ${OPENSSH_AUTHORIZED_KEYS_FILE} does not exist."
         return 1
     fi
-
-    rm -f $DESTDIR/etc/passwd $DESTDIR/etc/group
-    copy_file config /tmp/initramfs-passwd /etc/passwd
-    copy_file config /tmp/initramfs-group /etc/group
 }
 
 main $* || error_func

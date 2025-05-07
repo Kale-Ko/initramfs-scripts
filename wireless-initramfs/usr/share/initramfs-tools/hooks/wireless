@@ -24,7 +24,9 @@ error_func() {
 main() {
     copy_file config /etc/initramfs-tools/conf.d/wireless /scripts/wireless.conf
 
-    manual_add_modules ${WIRELESS_MODULES}
+    if [ -n "${WIRELESS_MODULES}" ]; then
+        manual_add_modules ${WIRELESS_MODULES}
+    fi
     copy_exec /sbin/wpa_supplicant
     copy_exec /sbin/wpa_cli
 
