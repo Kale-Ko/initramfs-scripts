@@ -11,7 +11,6 @@
 ssh-tpm-agent/debian/install
 !ssh-tpm-agent/debian/install.template
 
-.*
 *.deb
 *.build
 *.buildinfo
