@@ -21,4 +21,5 @@ ssh-tpm-agent/debian/install
 *.new
 *.new.*
 
+tmp/
 out/

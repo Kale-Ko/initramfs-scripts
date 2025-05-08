@@ -49,13 +49,27 @@ clean-artifacts:
 	rm -f openssh-initramfs_*.tar.gz openssh-initramfs_*.deb openssh-initramfs_*.buildinfo openssh-initramfs_*.changes openssh-initramfs_*.dsc
 	rm -f ssh-tpm-agent_*.tar.gz ssh-tpm-agent_*.deb ssh-tpm-agent_*.buildinfo ssh-tpm-agent_*.changes ssh-tpm-agent_*.dsc
 
+ARCH=$(shell dpkg --print-architecture)
+
 pull-ssh-tpm-agent:
-	curl -sSL https://api.github.com/repos/Foxboron/ssh-tpm-agent/releases/latest -o .ssh-tpm-agent-releases.json
-	curl -sSL $$(cat .ssh-tpm-agent-releases.json | jq -r '.assets[] | select(.name | test("^ssh-tpm-agent-v[0-9.-_]+-linux-amd64\\.tar\\.gz$$")) | .browser_download_url') -o .ssh-tpm-agent-amd64.tar.gz
-	curl -sSL $$(cat .ssh-tpm-agent-releases.json | jq -r '.assets[] | select(.name | test("^ssh-tpm-agent-v[0-9.-_]+-linux-arm64\\.tar\\.gz$$")) | .browser_download_url') -o .ssh-tpm-agent-arm64.tar.gz
-	mkdir -p ssh-tpm-agent/usr/bin/amd64/ ssh-tpm-agent/usr/bin/arm64/
-	tar -xzf .ssh-tpm-agent-amd64.tar.gz -C ssh-tpm-agent/usr/bin/amd64/ --strip-components 1 --exclude "LICENSE"
-	tar -xzf .ssh-tpm-agent-arm64.tar.gz -C ssh-tpm-agent/usr/bin/arm64/ --strip-components 1 --exclude "LICENSE"
-	rm -f .ssh-tpm-agent-releases.json .ssh-tpm-agent-amd64.tar.gz .ssh-tpm-agent-arm64.tar.gz
-	find ssh-tpm-agent/usr/bin/amd64 -type f -exec x86_64-linux-gnu-strip --strip-all {} \;
-	find ssh-tpm-agent/usr/bin/arm64 -type f -exec aarch64-linux-gnu-strip --strip-all {} \;
+	@ mkdir -p tmp/
+	curl -sSL https://api.github.com/repos/Foxboron/ssh-tpm-agent/releases/latest -o tmp/ssh-tpm-agent-releases.json
+	curl -sSL $$(cat tmp/ssh-tpm-agent-releases.json | jq -r '.assets[] | select(.name | test("^ssh-tpm-agent-v[0-9.-_]+-linux-${ARCH}\\.tar\\.gz$$")) | .browser_download_url') -o tmp/ssh-tpm-agent.tar.gz
+	@ mkdir -p ssh-tpm-agent/usr/bin/${ARCH}/
+	tar -xzf tmp/ssh-tpm-agent.tar.gz -C ssh-tpm-agent/usr/bin/${ARCH}/ --strip-components 1
+	@ rm -f tmp/ssh-tpm-agent-releases.json tmp/ssh-tpm-agent.tar.gz
+	@ rmdir tmp/
+	find ssh-tpm-agent/usr/bin/${ARCH} -type f ! -name LICENSE -exec strip --strip-all {} \;
+
+pull-ssh-tpm-agent-multiarch:
+	@ mkdir -p tmp/
+	curl -sSL https://api.github.com/repos/Foxboron/ssh-tpm-agent/releases/latest -o tmp/ssh-tpm-agent-releases.json
+	curl -sSL $$(cat tmp/ssh-tpm-agent-releases.json | jq -r '.assets[] | select(.name | test("^ssh-tpm-agent-v[0-9.-_]+-linux-amd64\\.tar\\.gz$$")) | .browser_download_url') -o tmp/ssh-tpm-agent-amd64.tar.gz
+	curl -sSL $$(cat tmp/ssh-tpm-agent-releases.json | jq -r '.assets[] | select(.name | test("^ssh-tpm-agent-v[0-9.-_]+-linux-arm64\\.tar\\.gz$$")) | .browser_download_url') -o tmp/ssh-tpm-agent-arm64.tar.gz
+	@ mkdir -p ssh-tpm-agent/usr/bin/amd64/ ssh-tpm-agent/usr/bin/arm64/
+	tar -xzf tmp/ssh-tpm-agent-amd64.tar.gz -C ssh-tpm-agent/usr/bin/amd64/ --strip-components 1
+	tar -xzf tmp/ssh-tpm-agent-arm64.tar.gz -C ssh-tpm-agent/usr/bin/arm64/ --strip-components 1
+	@ rm -f tmp/ssh-tpm-agent-releases.json tmp/ssh-tpm-agent-amd64.tar.gz tmp/ssh-tpm-agent-arm64.tar.gz
+	@ rmdir tmp/
+	find ssh-tpm-agent/usr/bin/amd64 -type f ! -name LICENSE -exec x86_64-linux-gnu-strip --strip-all {} \;
+	find ssh-tpm-agent/usr/bin/arm64 -type f ! -name LICENSE -exec aarch64-linux-gnu-strip --strip-all {} \;
