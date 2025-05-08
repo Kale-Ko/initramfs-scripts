@@ -21,18 +21,27 @@ error_func() {
 }
 
 main() {
-. /scripts/openssh.conf
+    . /scripts/openssh.conf
 
-if grep -qw "openssh" /proc/cmdline; then
-    echo "Killing OpenSSH"
+    if grep -qw "openssh" /proc/cmdline; then
+        echo "Killing OpenSSH"
 
-    pid=$(cat /run/initram-openssh.pid)
-    kill ${pid} $(ps -eo ppid,pid | grep -E "^[ \t]*${pid}[ \t]+" | awk '{ print $2 }')
+        pid=$(cat /run/initram-openssh.pid)
+        kill ${pid} $(ps -eo ppid,pid | grep -E "^[ \t]*${pid}[ \t]+" | awk '{ print $2 }')
+        rm -f /run/initram-openssh.pid
 
-    rm -f /run/initram-openssh.pid
+        if [ -e /run/initram-ssh-tpm-agent.pid ]; then
+            kill $(cat /run/initram-ssh-tpm-agent.pid)
+            rm -f /run/initram-ssh-tpm-agent.pid
+        fi
 
-    echo "Killed OpenSSH"
-fi
+        if [ -e /run/initram-ssh-agent.pid ]; then
+            kill $(cat /run/initram-ssh-agent.pid)
+            rm -f /run/initram-ssh-agent.pid
+        fi
+
+        echo "Killed OpenSSH"
+    fi
 }
 
 main $* || error_func
