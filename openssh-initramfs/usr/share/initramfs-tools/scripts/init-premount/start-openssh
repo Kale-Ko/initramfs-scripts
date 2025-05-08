@@ -28,29 +28,69 @@ error_func() {
 }
 
 main() {
-. /scripts/openssh.conf
+    . /scripts/openssh.conf
 
-if grep -qw "openssh" /proc/cmdline; then
-    echo "Starting OpenSSH server on ${OPENSSH_PORTS}"
+    if grep -qw "openssh" /proc/cmdline; then
+        echo "Starting OpenSSH server on ${OPENSSH_PORTS}"
 
-    mkdir -p /run/sshd
-    chown root:root -R /run/sshd
+        mkdir -p /run/sshd
+        chown root:root -R /run/sshd
 
-    IFS=','
-    ports=
-    for port in ${OPENSSH_PORTS}; do
-        ports="$ports -p $port"
-    done
+        IFS=','
+        ports=
+        for port in "${OPENSSH_PORTS}"; do
+            ports="$ports -p $port"
+        done
 
-    IFS=' '
-    keys=
-    for file in /etc/ssh/ssh_host_*key; do
-        keys="$keys -h $file "
-    done
+        keys=
+        if stat -t /etc/ssh/ssh_tpm_host_*key* >/dev/null 2>&1; then
+            keys="$keys -o HostKeyAgent=/run/initram-ssh-tpm-agent.sock"
 
-    /sbin/sshd -D -o PidFile=/run/initram-openssh.pid $ports -f /etc/ssh/sshd_config $keys &
-    echo "Started OpenSSH server"
-fi
+            IFS='
+'
+            for file in $(echo /etc/ssh/ssh_tpm_host_*key* | sed -E 's/ /\n/g' | sed -E 's/\.[a-zA-Z]*//g' | sort -u); do
+                keys="$keys -h $file"
+            done
+
+            /bin/ssh-agent -D -a "/run/initram-ssh-agent.sock" &
+            echo $! >/run/initram-ssh-agent.pid
+
+            while [ ! -e /run/initram-ssh-agent.sock ] && [ -d /proc/$(cat /run/initram-ssh-agent.pid)/ ]; do
+                sleep 0.1
+            done
+
+            /bin/ssh-tpm-agent -l "/run/initram-ssh-tpm-agent.sock" -A "/run/initram-ssh-agent.sock" --key-dir "/etc/ssh/" &
+            echo $! >/run/initram-ssh-tpm-agent.pid
+
+            while [ ! -e /run/initram-ssh-tpm-agent.sock ] && [ -d /proc/$(cat /run/initram-ssh-tpm-agent.pid)/ ]; do
+                sleep 0.1
+            done
+        elif stat -t /etc/ssh/ssh_host_*key >/dev/null 2>&1; then
+            keys="$keys -o HostKeyAgent=/run/initram-ssh-agent.sock"
+
+            IFS='
+'
+            for file in $(echo /etc/ssh/ssh_host_*key | sed -E 's/ /\n/g'); do
+                keys="$keys -h $file"
+            done
+
+            /bin/ssh-agent -D -a "/run/initram-ssh-agent.sock" &
+            echo $! >/run/initram-ssh-agent.pid
+
+            while [ ! -e /run/initram-ssh-agent.sock ] && [ -d /proc/$(cat /run/initram-ssh-agent.pid)/ ]; do
+                sleep 0.1
+            done
+        else
+            echo "SSH keys do not exist"
+            return 1
+        fi
+
+        eval set -- "-D $ports -f /etc/ssh/sshd_config $keys"
+        /sbin/sshd "$@" &
+        echo $! >/run/initram-openssh.pid
+
+        echo "Started OpenSSH server"
+    fi
 }
 
 main $* || error_func
