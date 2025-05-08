@@ -3,17 +3,17 @@
 build: build-wireless build-openssh build-ssh-tpm-agent
 
 build-wireless:
-	dpkg-buildpackage -- wireless-initramfs/
+	cd wireless-initramfs/ && dpkg-buildpackage
 
 build-openssh: openssh-initramfs/out/cryptroot-unlock-suid
-	dpkg-buildpackage -- openssh-initramfs/
+	cd openssh-initramfs/ && dpkg-buildpackage
 
 openssh-initramfs/out/cryptroot-unlock-suid: openssh-initramfs/cryptroot-unlock-suid.cpp
 	mkdir -p openssh-initramfs/out/
 	g++ -O3 -s openssh-initramfs/cryptroot-unlock-suid.cpp -o openssh-initramfs/out/cryptroot-unlock-suid
 
 build-ssh-tpm-agent:
-	dpkg-buildpackage -- ssh-tpm-agent/
+	cd ssh-tpm-agent/ && dpkg-buildpackage
 
 install-default: build-wireless build-openssh
 	sudo dpkg --install $$(cat wireless-initramfs/debian/files | grep -Eo '.*\.deb') $$(cat openssh-initramfs/debian/files | grep -Eo '.*\.deb') || sudo dpkg --configure --pending
