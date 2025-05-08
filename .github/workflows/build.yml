@@ -10,10 +10,19 @@ on:
 
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu-latest
+    name: Build (${{ matrix.arch }})
+    runs-on: ${{ matrix.arch_tag }}
     permissions:
       contents: read
+
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            arch_tag: ubuntu-24.04
+          - arch: aarch64
+            arch_tag: ubuntu-24.04-arm
+      fail-fast: false
 
     steps:
       - name: Checkout Code
