@@ -22,4 +22,26 @@ jobs:
 
       - name: Build
         run: |
+          make pull-ssh-tpm-agent
           make build
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: debian-artifacts
+          path: |
+            *.changes
+            *.buildinfo
+            *.deb
+            *.tar.gz
+            *.dsc
+          compression-level: 9
+
+      - name: Upload Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            *.deb
+            *.tar.gz
+          preserve_order: true
