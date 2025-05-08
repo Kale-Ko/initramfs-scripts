@@ -1,3 +1,9 @@
+wireless-initramfs (1.2-0) any; urgency=low
+
+  * A few bug fixes
+
+ -- Kale-Ko <github@kaleko.dev>  Thu, 8 May 2025 12:00:00 -0400
+
 wireless-initramfs (1.1-0) any; urgency=low
 
   * Added error handlers to properly notify the user if something goes wrong
