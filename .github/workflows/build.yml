@@ -25,4 +25,7 @@ jobs:
 
       - name: Build
         run: |
+          dpkg --help
+          dpkg-buildpackage --help
+          ls -la
           make build
