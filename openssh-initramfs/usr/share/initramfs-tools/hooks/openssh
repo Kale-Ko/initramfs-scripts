@@ -37,13 +37,13 @@ main() {
 
     for file in /lib/openssh/*; do
         if [ -e "$file" ]; then
-            copy_exec $file
+            copy_exec "$file"
         fi
     done
 
     for file in /lib/libnss_files* /lib/$(dpkg-architecture -qDEB_HOST_GNU_TYPE)/libnss_files*; do
         if [ -e "$file" ]; then
-            copy_exec $file
+            copy_exec "$file"
         fi
     done
 
@@ -55,10 +55,10 @@ main() {
     chown root:root $DESTDIR/scripts/cryptroot-unlock-suid
     chmod 6755 $DESTDIR/scripts/cryptroot-unlock-suid
 
-    mkdir -p ${OPENSSH_CONFIG_DIRECTORY}/
+    mkdir -p "${OPENSSH_CONFIG_DIRECTORY}"/
 
-    if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/sshd_config >/dev/null 2>&1; then
-        cat >${OPENSSH_CONFIG_DIRECTORY}/sshd_config <<EOF
+    if ! stat -t "${OPENSSH_CONFIG_DIRECTORY}"/sshd_config >/dev/null 2>&1; then
+        cat >"${OPENSSH_CONFIG_DIRECTORY}"/sshd_config <<EOF
 # This is not a complete configuration, for a complete list of options see sshd_config(5).
 
 AddressFamily any
@@ -87,23 +87,23 @@ AcceptEnv LANG LC_*
 EOF
     fi
 
-    if stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_tpm_host_*key* >/dev/null 2>&1; then
+    if stat -t "${OPENSSH_CONFIG_DIRECTORY}"/ssh_tpm_host_*key* >/dev/null 2>&1; then
         copy_exec /bin/ssh-tpm-agent
         copy_exec /bin/ssh-tpm-add
-    elif ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/ssh_host_*key >/dev/null 2>&1; then
-        if [ ${OPENSSH_GENERATE_SERVER_KEYS} = "true" ] || [ ${OPENSSH_GENERATE_SERVER_KEYS} = "standard" ]; then
+    elif ! stat -t "${OPENSSH_CONFIG_DIRECTORY}"/ssh_host_*key >/dev/null 2>&1; then
+        if [ "${OPENSSH_GENERATE_SERVER_KEYS}" = "true" ] || [ "${OPENSSH_GENERATE_SERVER_KEYS}" = "standard" ]; then
             echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new standard keys."
 
             mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
             ssh-keygen -Ah -f /tmp/initramfs-ssh/ -N ""
             cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
             rm -rf /tmp/initramfs-ssh/
-        elif [ ${OPENSSH_GENERATE_SERVER_KEYS} = "tpm" ]; then
+        elif [ "${OPENSSH_GENERATE_SERVER_KEYS}" = "tpm" ]; then
             echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new tpm keys."
 
             mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
             ssh-tpm-keygen -A -f /tmp/initramfs-ssh/ -N ""
-            cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
+            cp -r /tmp/initramfs-ssh/etc/ssh/* "${OPENSSH_CONFIG_DIRECTORY}"/
             rm -rf /tmp/initramfs-ssh/
         else
             echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY} and OPENSSH_GENERATE_SERVER_KEYS is set to false."
@@ -111,18 +111,18 @@ EOF
         fi
     fi
 
-    if ! stat -t ${OPENSSH_CONFIG_DIRECTORY}/moduli >/dev/null 2>&1; then
+    if ! stat -t "${OPENSSH_CONFIG_DIRECTORY}"/moduli >/dev/null 2>&1; then
         if [ -f /etc/ssh/moduli ]; then
-            cp /etc/ssh/moduli ${OPENSSH_CONFIG_DIRECTORY}
+            cp /etc/ssh/moduli "${OPENSSH_CONFIG_DIRECTORY}"
         else
             echo "SSH moduli file does not exist in ${OPENSSH_CONFIG_DIRECTORY} or /etc/ssh/."
             return 1
         fi
     fi
 
-    for file in ${OPENSSH_CONFIG_DIRECTORY}/*; do
-        if [ -e "$file" ] && ([ ! -e ${OPENSSH_AUTHORIZED_KEYS_FILE} ] || [ $(realpath $file) != $(realpath ${OPENSSH_AUTHORIZED_KEYS_FILE}) ]); then
-            copy_file config $file /etc/ssh/
+    for file in "${OPENSSH_CONFIG_DIRECTORY}"/*; do
+        if [ -e "$file" ] && ([ ! -e "${OPENSSH_AUTHORIZED_KEYS_FILE}" ] || [ $(realpath "$file") != $(realpath "${OPENSSH_AUTHORIZED_KEYS_FILE}") ]); then
+            copy_file config "$file" /etc/ssh/
         fi
     done
 
@@ -145,7 +145,7 @@ EOF
 
     home=/tmp/initramfs-root
 
-    if [ ${OPENSSH_AUTHORIZED_USER} != "root" ]; then
+    if [ "${OPENSSH_AUTHORIZED_USER}" != "root" ]; then
         cat >>/tmp/initramfs-passwd <<EOF
 ${OPENSSH_AUTHORIZED_USER}:*:1000:1000:${OPENSSH_AUTHORIZED_USER}:/tmp/initramfs-user:/bin/sh
 EOF
@@ -153,7 +153,7 @@ EOF
 ${OPENSSH_AUTHORIZED_USER}:*:1000:
 EOF
         mkdir -p $DESTDIR/tmp/initramfs-user
-        chown ${OPENSSH_AUTHORIZED_USER}:${OPENSSH_AUTHORIZED_USER} -R $DESTDIR/tmp/initramfs-user
+        chown "${OPENSSH_AUTHORIZED_USER}:${OPENSSH_AUTHORIZED_USER}" -R $DESTDIR/tmp/initramfs-user
 
         home=/tmp/initramfs-user
     fi
@@ -163,9 +163,9 @@ EOF
     copy_file group /tmp/initramfs-group /etc/group
     rm -f /tpm/initramfs-passwd /tpm/initramfs-group
 
-    if stat -t ${OPENSSH_AUTHORIZED_KEYS_FILE} >/dev/null 2>&1; then
-        mkdir -p $DESTDIR/$home/.ssh/
-        copy_file authorized_keys ${OPENSSH_AUTHORIZED_KEYS_FILE} $home/.ssh/authorized_keys
+    if stat -t "${OPENSSH_AUTHORIZED_KEYS_FILE}" >/dev/null 2>&1; then
+        mkdir -p $DESTDIR/"$home/.ssh/"
+        copy_file authorized_keys "${OPENSSH_AUTHORIZED_KEYS_FILE}" "$home/.ssh/authorized_keys"
     else
         echo "SSH authorized_keys file ${OPENSSH_AUTHORIZED_KEYS_FILE} does not exist."
         return 1
