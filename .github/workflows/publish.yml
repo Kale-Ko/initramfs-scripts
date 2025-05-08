@@ -7,10 +7,19 @@ on:
 
 jobs:
   publish:
-    name: Publish
-    runs-on: ubuntu-latest
+    name: Publish (${{ matrix.arch }})
+    runs-on: ${{ matrix.arch_tag }}
     permissions:
       contents: write
+
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            arch_tag: ubuntu-24.04
+          - arch: aarch64
+            arch_tag: ubuntu-24.04-arm
+      fail-fast: false
 
     steps:
       - name: Checkout Code
@@ -28,14 +37,13 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: debian-artifacts
+          name: debian-${{ matrix.arch }}
           path: |
             *.changes
             *.buildinfo
             *.deb
             *.tar.gz
             *.dsc
-          compression-level: 9
 
       - name: Upload Release
         uses: softprops/action-gh-release@v2
@@ -43,5 +51,3 @@ jobs:
           tag_name: ${{ github.ref_name }}
           files: |
             *.deb
-            *.tar.gz
-          preserve_order: true
