@@ -21,10 +21,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          sudo apt install gcc g++ binutils-x86-64-linux-gnu binutils-aarch64-linux-gnu
+          sudo apt install build-essential gcc g++ make binutils-x86-64-linux-gnu binutils-aarch64-linux-gnu debhelper
 
       - name: Build
         run: |
-          dpkg-buildpackage --help
-          ls -la
           make build
