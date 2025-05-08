@@ -29,13 +29,16 @@ main() {
     . /scripts/wireless.conf
 
     if grep -qw "wireless" /proc/cmdline; then
-        echo "Killing wireless"
-        kill $(cat /run/initram-wpa_supplicant.pid)
+        if [ -e /run/initram-wpa_supplicant.pid ]; then
+            echo "Killing wireless"
 
-        rm -rf /run/initram-wpa_supplicant_interface
-        rm -f /run/initram-wpa_supplicant.pid
+            kill $(cat /run/initram-wpa_supplicant.pid)
 
-        echo "Killed wireless"
+            rm -rf /run/initram-wpa_supplicant_interface
+            rm -f /run/initram-wpa_supplicant.pid
+
+            echo "Killed wireless"
+        fi
     fi
 }
 
