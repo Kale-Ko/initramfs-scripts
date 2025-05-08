@@ -51,9 +51,13 @@ main() {
     chown root:root $DESTDIR/scripts/cryptroot-unlock
     chmod 0755 $DESTDIR/scripts/cryptroot-unlock
 
-    copy_exec /usr/share/initramfs-tools/scripts/cryptroot-unlock-suid /scripts/cryptroot-unlock-suid
-    chown root:root $DESTDIR/scripts/cryptroot-unlock-suid
-    chmod 6755 $DESTDIR/scripts/cryptroot-unlock-suid
+    if [ "${OPENSSH_AUTHORIZED_USER}" != "root" ]; then
+        copy_exec /usr/share/initramfs-tools/scripts/cryptroot-unlock-suid /scripts/cryptroot-unlock-suid
+        chown root:root $DESTDIR/scripts/cryptroot-unlock-suid
+        chmod 6755 $DESTDIR/scripts/cryptroot-unlock-suid
+    else
+        ln $DESTDIR/scripts/cryptroot-unlock $DESTDIR/scripts/cryptroot-unlock-suid
+    fi
 
     mkdir -p "${OPENSSH_CONFIG_DIRECTORY}"/
 
