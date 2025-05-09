@@ -1,14 +1,14 @@
 #!/bin/sh
 
-# Replace with your WiFi card's name
+# Replace with your WiFi card's name.
 WIRELESS_INTERFACE="<card>"
 export WIRELESS_INTERFACE
 
-# Replace with the modules you need for your WiFi card
+# Replace with the modules you need for your WiFi card.
 WIRELESS_MODULES="<module> <module>..."
 export WIRELESS_MODULES
 
-# Replace with your WiFi credentials
+# Replace with your WiFi credentials. Use an empty password for an open network.
 # If you wish to use a different WiFi authentication method view wpa_supplicant.conf in initramfs-tools/hooks/wireless
 WIRELESS_SSID="<your ssid>"
 export WIRELESS_SSID

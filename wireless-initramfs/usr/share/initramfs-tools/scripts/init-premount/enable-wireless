@@ -25,16 +25,14 @@ error_func() {
 main() {
     . /scripts/wireless.conf
 
-    AUTH_LIMIT=30
-
     if grep -qw "wireless" /proc/cmdline; then
         WPA_COMMAND="/sbin/wpa_cli -p /run/initram-wpa_supplicant_interface -i ${WIRELESS_INTERFACE}"
 
         echo "Starting wireless connection on ${WIRELESS_INTERFACE}"
         /sbin/wpa_supplicant -B -i ${WIRELESS_INTERFACE} -c /etc/wpa_supplicant.conf -P /run/initram-wpa_supplicant.pid -f /tmp/initram-wpa_supplicant.log
 
-        limit=${AUTH_LIMIT}
-        echo "Waiting for connection (max ${AUTH_LIMIT} seconds)"
+        limit=30
+        echo "Waiting for connection (max 30 seconds)"
         while [ $limit -ge 0 -a "$($WPA_COMMAND status | grep wpa_state)" != "wpa_state=COMPLETED" ]; do
             echo -n "."
             sleep 1
