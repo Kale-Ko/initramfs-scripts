@@ -1,3 +1,9 @@
+wireless-initramfs (1.3-0) any; urgency=low
+
+  * Allow an empty password to be used to connect to an open WiFi network
+
+ -- Kale-Ko <github@kaleko.dev>  Fri, 9 May 2025 12:00:00 -0400
+
 wireless-initramfs (1.2-0) any; urgency=low
 
   * A few bug fixes
