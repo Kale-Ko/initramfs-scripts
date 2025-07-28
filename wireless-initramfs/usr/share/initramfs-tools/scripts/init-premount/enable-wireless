@@ -29,10 +29,10 @@ main() {
         WPA_COMMAND="/sbin/wpa_cli -p /run/initram-wpa_supplicant_interface -i ${WIRELESS_INTERFACE}"
 
         echo "Starting wireless connection on ${WIRELESS_INTERFACE}"
-        /sbin/wpa_supplicant -B -i ${WIRELESS_INTERFACE} -c /etc/wpa_supplicant.conf -P /run/initram-wpa_supplicant.pid -f /tmp/initram-wpa_supplicant.log
+        /sbin/wpa_supplicant -B -i "${WIRELESS_INTERFACE}" -c /etc/wpa_supplicant.conf -P /run/initram-wpa_supplicant.pid -f /tmp/initram-wpa_supplicant.log
 
         limit=30
-        echo "Waiting for connection (max 30 seconds)"
+        echo "Waiting for connection (max ${limit} seconds)"
         while [ $limit -ge 0 -a "$($WPA_COMMAND status | grep wpa_state)" != "wpa_state=COMPLETED" ]; do
             echo -n "."
             sleep 1
