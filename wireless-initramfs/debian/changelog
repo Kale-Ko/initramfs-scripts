@@ -1,6 +1,6 @@
 wireless-initramfs (1.4-0) any; urgency=medium
 
-  * Fix potentially updating the initramfs twice on install
+  * Fixed potentially updating the initramfs twice on install
   * A few other bug fixes
 
  -- Kale-Ko <github@kaleko.dev>  Mon, 28 Jul 2025 12:00:00 -0400

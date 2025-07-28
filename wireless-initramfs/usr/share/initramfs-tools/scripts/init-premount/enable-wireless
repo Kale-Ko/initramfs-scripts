@@ -4,9 +4,9 @@ set -o pipefail
 
 PREREQ=""
 prereqs() {
-    echo "$PREREQ"
+    echo "${PREREQ}"
 }
-case $1 in
+case "${1}" in
 prereqs)
     prereqs
     exit 0
@@ -33,14 +33,14 @@ main() {
 
         limit=30
         echo "Waiting for connection (max ${limit} seconds)"
-        while [ $limit -ge 0 -a "$($WPA_COMMAND status | grep wpa_state)" != "wpa_state=COMPLETED" ]; do
+        while [ $limit -ge 0 -a "$(${WPA_COMMAND} status | grep wpa_state)" != "wpa_state=COMPLETED" ]; do
             echo -n "."
             sleep 1
             limit=$(expr $limit - 1)
         done
         echo ""
 
-        if [ "$($WPA_COMMAND status | grep wpa_state)" != "wpa_state=COMPLETED" ]; then
+        if [ "$(${WPA_COMMAND} status | grep wpa_state)" != "wpa_state=COMPLETED" ]; then
             export ONLINE=0
             echo "Wireless offline after timeout"
             return 1
