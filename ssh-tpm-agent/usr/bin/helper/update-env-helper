@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e
+set -o pipefail
 
 help() {
     cat <<EOF
@@ -22,29 +24,34 @@ fi
 shift
 
 case "${command}" in
-set)
-    priority="${1}"
-    if [ -z "${priority}" ]; then
-        help
-        exit 1
-    fi
-    shift
+    set)
+        priority="${1}"
+        if [ -z "${priority}" ]; then
+            help
+            exit 1
+        fi
+        shift
 
-    if ! echo "${priority}" | grep -qE '^[0-9]+$'; then
-        help
-        exit 1
-    fi
+        if ! echo "${priority}" | grep -qE '^[0-9]+$'; then
+            help
+            exit 1
+        fi
 
-    for var in "$@"; do
-        key=$(echo "${var}" | cut -d "=" -f "1")
-        value=$(echo "${var}" | cut -d "=" -f "2-")
+        for var in "$@"; do
+            key=$(echo "${var}" | cut -d "=" -f "1")
+            value=$(echo "${var}" | cut -d "=" -f "2-")
 
-        if [ -f "${XDG_RUNTIME_DIR}/env-helper/${key}" ]; then
-            prevPriority=$(cat "${XDG_RUNTIME_DIR}/env-helper/${key}")
+            if [ -f "${XDG_RUNTIME_DIR}/env-helper/${key}" ]; then
+                prevPriority=$(cat "${XDG_RUNTIME_DIR}/env-helper/${key}")
 
-            if [ ! -z "${prevPriority}" ]; then
-                if [ ${priority} -lt ${prevPriority} ]; then
-                    echo "${key} - New priority is lower than current priority"
+                if [ ! -z "${prevPriority}" ]; then
+                    if [ ${priority} -lt ${prevPriority} ]; then
+                        echo "${key} - New priority is lower than current priority"
+                    else
+                        dbus-update-activation-environment --verbose --systemd "${key}=${value}"
+                        systemctl --user set-environment "${key}=${value}"
+                        echo ${priority} >"${XDG_RUNTIME_DIR}/env-helper/${key}"
+                    fi
                 else
                     dbus-update-activation-environment --verbose --systemd "${key}=${value}"
                     systemctl --user set-environment "${key}=${value}"
@@ -55,35 +62,30 @@ set)
                 systemctl --user set-environment "${key}=${value}"
                 echo ${priority} >"${XDG_RUNTIME_DIR}/env-helper/${key}"
             fi
-        else
-            dbus-update-activation-environment --verbose --systemd "${key}=${value}"
-            systemctl --user set-environment "${key}=${value}"
-            echo ${priority} >"${XDG_RUNTIME_DIR}/env-helper/${key}"
-        fi
-    done
+        done
 
-    exit 0
-    ;;
-unset)
-    for var in "$@"; do
-        key=$(echo "${var}" | cut -d "=" -f "1")
-        value=$(echo "${var}" | cut -d "=" -f "2-")
+        exit 0
+        ;;
+    unset)
+        for var in "$@"; do
+            key=$(echo "${var}" | cut -d "=" -f "1")
+            value=$(echo "${var}" | cut -d "=" -f "2-")
 
-        prevValue=$(printenv "${key}")
+            prevValue=$(printenv "${key}")
 
-        if [ "${value}" != "${prevValue}" ]; then
-            echo "${key} - Supplied value does not match current value"
-        else
-            dbus-update-activation-environment --verbose --systemd "${key}="
-            systemctl --user unset-environment "${key}"
-            rm -f "${XDG_RUNTIME_DIR}/env-helper/${key}"
-        fi
-    done
+            if [ "${value}" != "${prevValue}" ]; then
+                echo "${key} - Supplied value does not match current value"
+            else
+                dbus-update-activation-environment --verbose --systemd "${key}="
+                systemctl --user unset-environment "${key}"
+                rm -f "${XDG_RUNTIME_DIR}/env-helper/${key}"
+            fi
+        done
 
-    exit 0
-    ;;
-*)
-    help
-    exit 1
-    ;;
+        exit 0
+        ;;
+    *)
+        help
+        exit 1
+        ;;
 esac
