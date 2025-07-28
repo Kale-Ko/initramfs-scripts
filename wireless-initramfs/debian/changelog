@@ -1,4 +1,4 @@
-wireless-initramfs (1.4-0) any; urgency=low
+wireless-initramfs (1.4-0) any; urgency=medium
 
   * Fix potentially updating the initramfs twice on install
   * A few other bug fixes

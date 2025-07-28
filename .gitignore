@@ -4,6 +4,7 @@
 !**/debian/copyright
 !**/debian/rules
 !**/debian/install
+!**/debian/trigger
 !**/debian/preinst
 !**/debian/postinst
 !**/debian/prerm

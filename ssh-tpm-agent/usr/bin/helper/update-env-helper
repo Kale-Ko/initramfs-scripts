@@ -6,15 +6,15 @@ help() {
 
 Usage:
   set <priority> (<key>=<value> ...)
-  unset (<key> ...)
+  unset (<key>=<expected-value> ...)
 
 -----------------------------------
 EOF
 }
 
-mkdir -p $XDG_RUNTIME_DIR/env-helper
+mkdir -p "$XDG_RUNTIME_DIR/env-helper"
 
-command=$1
+command="$1"
 if [ -z "$command" ]; then
     help
     exit 1
@@ -23,7 +23,7 @@ shift
 
 case "$command" in
 set)
-    priority=$1
+    priority="$1"
     if [ -z "$priority" ]; then
         help
         exit 1
@@ -39,8 +39,8 @@ set)
         key=$(echo "$var" | cut -d "=" -f "1")
         value=$(echo "$var" | cut -d "=" -f "2-")
 
-        if [ -f $XDG_RUNTIME_DIR/env-helper/$key ]; then
-            prevPriority=$(cat $XDG_RUNTIME_DIR/env-helper/$key)
+        if [ -f "$XDG_RUNTIME_DIR/env-helper/$key" ]; then
+            prevPriority=$(cat "$XDG_RUNTIME_DIR/env-helper/$key")
 
             if [ ! -z "$prevPriority" ]; then
                 if [ $priority -lt $prevPriority ]; then
@@ -48,17 +48,17 @@ set)
                 else
                     dbus-update-activation-environment --verbose --systemd "$key=$value"
                     systemctl --user set-environment "$key=$value"
-                    echo $priority >$XDG_RUNTIME_DIR/env-helper/$key
+                    echo $priority >"$XDG_RUNTIME_DIR/env-helper/$key"
                 fi
             else
                 dbus-update-activation-environment --verbose --systemd "$key=$value"
                 systemctl --user set-environment "$key=$value"
-                echo $priority >$XDG_RUNTIME_DIR/env-helper/$key
+                echo $priority >"$XDG_RUNTIME_DIR/env-helper/$key"
             fi
         else
             dbus-update-activation-environment --verbose --systemd "$key=$value"
             systemctl --user set-environment "$key=$value"
-            echo $priority >$XDG_RUNTIME_DIR/env-helper/$key
+            echo $priority >"$XDG_RUNTIME_DIR/env-helper/$key"
         fi
     done
 
@@ -69,14 +69,14 @@ unset)
         key=$(echo "$var" | cut -d "=" -f "1")
         value=$(echo "$var" | cut -d "=" -f "2-")
 
-        prevValue=$(printenv $key)
+        prevValue=$(printenv "$key")
 
         if [ "$value" != "$prevValue" ]; then
             echo "$key - Supplied value does not match current value"
         else
             dbus-update-activation-environment --verbose --systemd "$key="
             systemctl --user unset-environment "$key"
-            rm -f $XDG_RUNTIME_DIR/env-helper/$key
+            rm -f "$XDG_RUNTIME_DIR/env-helper/$key"
         fi
     done
 
