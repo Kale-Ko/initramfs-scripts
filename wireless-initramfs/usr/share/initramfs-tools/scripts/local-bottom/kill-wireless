@@ -4,7 +4,7 @@ set -o pipefail
 
 PREREQ=""
 
-if [ -f "$(dirname $(realpath $0))/stop-openssh" ]; then
+if [ -f "$(dirname $(realpath "$0"))/stop-openssh" ]; then
     PREREQ="${PREREQ} stop-openssh"
 fi
 
