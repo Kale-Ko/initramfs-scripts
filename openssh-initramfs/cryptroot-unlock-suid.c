@@ -1,4 +1,3 @@
-#include <cstdlib>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <pwd.h>
@@ -31,8 +30,8 @@ int main()
         return 1;
     }
 
-    char* argv[2] = { (char*) PATH, nullptr };
-    char** envp = environ;
+    char* argv[2] = { (char*) PATH, NULL };
+    char** envp = __environ;
     execve(PATH, argv, envp);
 
     return 0;
