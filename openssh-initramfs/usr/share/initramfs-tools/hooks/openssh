@@ -4,7 +4,7 @@ set -o pipefail
 
 PREREQ="cryptroot cryptroot-unlock"
 
-if [ -f "$(dirname $(realpath $0))/wireless" ]; then
+if [ -f "$(dirname $(realpath "${0}"))/wireless" ]; then
     PREREQ="${PREREQ} wireless"
 fi
 
@@ -12,10 +12,10 @@ prereqs() {
     echo "${PREREQ}"
 }
 case "${1}" in
-prereqs)
-    prereqs
-    exit 0
-    ;;
+    prereqs)
+        prereqs
+        exit 0
+        ;;
 esac
 
 . /usr/share/initramfs-tools/hook-functions
@@ -36,27 +36,27 @@ main() {
     copy_exec /sbin/sshd
 
     for file in /lib/openssh/*; do
-        if [ -e "$file" ]; then
-            copy_exec "$file"
+        if [ -e "${file}" ]; then
+            copy_exec "${file}"
         fi
     done
 
     for file in /lib/libnss_files* /lib/$(dpkg-architecture -qDEB_HOST_GNU_TYPE)/libnss_files*; do
-        if [ -e "$file" ]; then
-            copy_exec "$file"
+        if [ -e "${file}" ]; then
+            copy_exec "${file}"
         fi
     done
 
-    cp $DESTDIR/bin/cryptroot-unlock $DESTDIR/scripts/cryptroot-unlock
-    chown root:root $DESTDIR/scripts/cryptroot-unlock
-    chmod 0755 $DESTDIR/scripts/cryptroot-unlock
+    cp "${DESTDIR}"/bin/cryptroot-unlock "${DESTDIR}"/scripts/cryptroot-unlock
+    chown 0:0 "${DESTDIR}"/scripts/cryptroot-unlock
+    chmod 0555 "${DESTDIR}"/scripts/cryptroot-unlock
 
     if [ "${OPENSSH_AUTHORIZED_USER}" != "root" ]; then
         copy_exec /usr/share/initramfs-tools/scripts/cryptroot-unlock-suid /scripts/cryptroot-unlock-suid
-        chown root:root $DESTDIR/scripts/cryptroot-unlock-suid
-        chmod 6755 $DESTDIR/scripts/cryptroot-unlock-suid
+        chown 0:0 "${DESTDIR}"/scripts/cryptroot-unlock-suid
+        chmod 6555 "${DESTDIR}"/scripts/cryptroot-unlock-suid
     else
-        ln $DESTDIR/scripts/cryptroot-unlock $DESTDIR/scripts/cryptroot-unlock-suid
+        ln "${DESTDIR}"/scripts/cryptroot-unlock "${DESTDIR}"/scripts/cryptroot-unlock-suid
     fi
 
     mkdir -p "${OPENSSH_CONFIG_DIRECTORY}"/
@@ -100,7 +100,7 @@ EOF
 
             mkdir -p /tmp/initramfs-ssh/ /tmp/initramfs-ssh/etc/ssh/
             ssh-keygen -Ah -f /tmp/initramfs-ssh/ -N ""
-            cp -r /tmp/initramfs-ssh/etc/ssh/* ${OPENSSH_CONFIG_DIRECTORY}/
+            cp -r /tmp/initramfs-ssh/etc/ssh/* "${OPENSSH_CONFIG_DIRECTORY}"/
             rm -rf /tmp/initramfs-ssh/
         elif [ "${OPENSSH_GENERATE_SERVER_KEYS}" = "tpm" ]; then
             echo "SSH keys do not exist in ${OPENSSH_CONFIG_DIRECTORY}, generating new tpm keys."
@@ -125,8 +125,8 @@ EOF
     fi
 
     for file in "${OPENSSH_CONFIG_DIRECTORY}"/*; do
-        if [ -e "$file" ] && ([ ! -e "${OPENSSH_AUTHORIZED_KEYS_FILE}" ] || [ $(realpath "$file") != $(realpath "${OPENSSH_AUTHORIZED_KEYS_FILE}") ]); then
-            copy_file config "$file" /etc/ssh/
+        if [ -e "${file}" ] && ([ ! -e "${OPENSSH_AUTHORIZED_KEYS_FILE}" ] || [ "$(realpath "${file}")" != "$(realpath "${OPENSSH_AUTHORIZED_KEYS_FILE}")" ]); then
+            copy_file config "${file}" /etc/ssh/
         fi
     done
 
@@ -134,7 +134,7 @@ EOF
 passwd: files
 group:  files
 EOF
-    rm -f $DESTDIR/etc/nsswitch.conf # TODO Play nice with other scripts
+    rm -f "${DESTDIR}"/etc/nsswitch.conf # TODO Play nice with other scripts
     copy_file nsswitch.conf /tmp/initramfs-nsswitch.conf /etc/nsswitch.conf
 
     cat >/tmp/initramfs-passwd <<EOF
@@ -144,8 +144,8 @@ EOF
     cat >/tmp/initramfs-group <<EOF
 root:*:0:
 EOF
-    mkdir -p $DESTDIR/tmp/initramfs-root $DESTDIR/run/sshd
-    chown root:root -R $DESTDIR/tmp/initramfs-root $DESTDIR/run/sshd
+    mkdir -p "${DESTDIR}"/tmp/initramfs-root "${DESTDIR}"/run/sshd
+    chown 0:0 -R "${DESTDIR}"/tmp/initramfs-root "${DESTDIR}"/run
 
     home=/tmp/initramfs-root
 
@@ -156,20 +156,20 @@ EOF
         cat >>/tmp/initramfs-group <<EOF
 ${OPENSSH_AUTHORIZED_USER}:*:1000:
 EOF
-        mkdir -p $DESTDIR/tmp/initramfs-user
-        chown "${OPENSSH_AUTHORIZED_USER}:${OPENSSH_AUTHORIZED_USER}" -R $DESTDIR/tmp/initramfs-user
+        mkdir -p "${DESTDIR}"/tmp/initramfs-user
+        chown 1000:1000 -R "${DESTDIR}"/tmp/initramfs-user
 
         home=/tmp/initramfs-user
     fi
 
-    rm -f $DESTDIR/etc/passwd $DESTDIR/etc/group # TODO Play nice with other scripts
+    rm -f "${DESTDIR}"/etc/passwd "${DESTDIR}"/etc/group # TODO Play nice with other scripts
     copy_file passwd /tmp/initramfs-passwd /etc/passwd
     copy_file group /tmp/initramfs-group /etc/group
     rm -f /tpm/initramfs-passwd /tpm/initramfs-group
 
     if stat -t "${OPENSSH_AUTHORIZED_KEYS_FILE}" >/dev/null 2>&1; then
-        mkdir -p $DESTDIR/"$home/.ssh/"
-        copy_file authorized_keys "${OPENSSH_AUTHORIZED_KEYS_FILE}" "$home/.ssh/authorized_keys"
+        mkdir -p "${DESTDIR}/${home}/.ssh/"
+        copy_file authorized_keys "${OPENSSH_AUTHORIZED_KEYS_FILE}" "${home}/.ssh/authorized_keys"
     else
         echo "SSH authorized_keys file ${OPENSSH_AUTHORIZED_KEYS_FILE} does not exist."
         return 1

@@ -1,4 +1,13 @@
-openssh-initramfs (1.3-0) any; urgency=low
+openssh-initramfs (1.4-0) any; urgency=medium
+
+  * Fixed an issue with multiple ports causing the OpenSSH server to crash
+  * Fixed trying to use a user that doesn't exist on the host (or one with a different id) causing update-initramfs to fail or a startup error
+  * Fixed potentially updating the initramfs twice on install
+  * A few other bug fixes
+
+ -- Kale-Ko <github@kaleko.dev>  Mon, 28 Jul 2025 12:00:00 -0400
+
+openssh-initramfs (1.3-0) any; urgency=medium
 
   * An ssh-agent is now started to read host keys
     - If ssh-tpm-agent is installed ssh-tpm-agent will also be started so that tpm keys can be read
@@ -7,7 +16,7 @@ openssh-initramfs (1.3-0) any; urgency=low
 
  -- Kale-Ko <github@kaleko.dev>  Thu, 8 May 2025 12:00:00 -0400
 
-openssh-initramfs (1.2-0) any; urgency=low
+openssh-initramfs (1.2-0) any; urgency=medium
 
   * OpenSSH and all it's children now get killed after unlock
   * Added error handlers to properly notify the user if something goes wrong
