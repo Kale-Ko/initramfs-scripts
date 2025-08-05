@@ -8,9 +8,9 @@ build-wireless:
 build-openssh: openssh-initramfs/out/cryptroot-unlock-suid
 	cd openssh-initramfs/ && dpkg-buildpackage
 
-openssh-initramfs/out/cryptroot-unlock-suid: openssh-initramfs/cryptroot-unlock-suid.cpp
+openssh-initramfs/out/cryptroot-unlock-suid: openssh-initramfs/cryptroot-unlock-suid.c
 	mkdir -p openssh-initramfs/out/
-	g++ -O3 -s openssh-initramfs/cryptroot-unlock-suid.cpp -o openssh-initramfs/out/cryptroot-unlock-suid
+	gcc -O3 -s openssh-initramfs/cryptroot-unlock-suid.c -o openssh-initramfs/out/cryptroot-unlock-suid
 
 build-ssh-tpm-agent:
 	cd ssh-tpm-agent/ && dpkg-buildpackage
