@@ -4,13 +4,13 @@ set -o pipefail
 
 PREREQ=""
 prereqs() {
-    echo "$PREREQ"
+    echo "${PREREQ}"
 }
-case $1 in
-prereqs)
-    prereqs
-    exit 0
-    ;;
+case "${1}" in
+    prereqs)
+        prereqs
+        exit 0
+        ;;
 esac
 
 . /scripts/functions

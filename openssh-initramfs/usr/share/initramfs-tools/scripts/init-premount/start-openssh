@@ -4,18 +4,18 @@ set -o pipefail
 
 PREREQ=""
 
-if [ -f "$(dirname $(realpath $0))/enable-wireless" ]; then
+if [ -f "$(dirname $(realpath "${0}"))/enable-wireless" ]; then
     PREREQ="${PREREQ} enable-wireless"
 fi
 
 prereqs() {
-    echo "$PREREQ"
+    echo "${PREREQ}"
 }
-case $1 in
-prereqs)
-    prereqs
-    exit 0
-    ;;
+case "${1}" in
+    prereqs)
+        prereqs
+        exit 0
+        ;;
 esac
 
 . /scripts/functions
@@ -38,56 +38,71 @@ main() {
 
         IFS=','
         ports=
-        for port in "${OPENSSH_PORTS}"; do
-            ports="$ports -p $port"
+        for port in ${OPENSSH_PORTS}; do
+            ports="${ports} -p ${port}"
         done
 
         keys=
         if stat -t /etc/ssh/ssh_tpm_host_*key* >/dev/null 2>&1; then
-            keys="$keys -o HostKeyAgent=/run/initram-ssh-tpm-agent.sock"
+            keys="${keys} -o HostKeyAgent=/run/initram-ssh-tpm-agent.sock"
 
             IFS='
 '
             for file in $(echo /etc/ssh/ssh_tpm_host_*key* | sed -E 's/ /\n/g' | sed -E 's/\.[a-zA-Z]*//g' | sort -u); do
-                keys="$keys -h $file"
+                keys="${keys} -h ${file}"
             done
 
             /bin/ssh-agent -D -a "/run/initram-ssh-agent.sock" &
-            echo $! >/run/initram-ssh-agent.pid
+            echo -n $! >/run/initram-ssh-agent.pid
 
             while [ ! -e /run/initram-ssh-agent.sock ] && [ -d /proc/$(cat /run/initram-ssh-agent.pid)/ ]; do
                 sleep 0.1
             done
 
+            if [ ! -d /proc/$(cat /run/initram-ssh-agent.pid)/ ]; then
+                echo "Failed to start ssh-agent"
+                return 1
+            fi
+
             /bin/ssh-tpm-agent -l "/run/initram-ssh-tpm-agent.sock" -A "/run/initram-ssh-agent.sock" --key-dir "/etc/ssh/" &
-            echo $! >/run/initram-ssh-tpm-agent.pid
+            echo -n $! >/run/initram-ssh-tpm-agent.pid
 
             while [ ! -e /run/initram-ssh-tpm-agent.sock ] && [ -d /proc/$(cat /run/initram-ssh-tpm-agent.pid)/ ]; do
                 sleep 0.1
             done
+
+            if [ ! -d /proc/$(cat /run/initram-ssh-tpm-agent.pid)/ ]; then
+                echo "Failed to start ssh-tpm-agent"
+                return 1
+            fi
         elif stat -t /etc/ssh/ssh_host_*key >/dev/null 2>&1; then
-            keys="$keys -o HostKeyAgent=/run/initram-ssh-agent.sock"
+            keys="${keys} -o HostKeyAgent=/run/initram-ssh-agent.sock"
 
             IFS='
 '
             for file in $(echo /etc/ssh/ssh_host_*key | sed -E 's/ /\n/g'); do
-                keys="$keys -h $file"
+                keys="${keys} -h ${file}"
             done
 
             /bin/ssh-agent -D -a "/run/initram-ssh-agent.sock" &
-            echo $! >/run/initram-ssh-agent.pid
+            echo -n $! >/run/initram-ssh-agent.pid
 
             while [ ! -e /run/initram-ssh-agent.sock ] && [ -d /proc/$(cat /run/initram-ssh-agent.pid)/ ]; do
                 sleep 0.1
             done
+
+            if [ ! -d /proc/$(cat /run/initram-ssh-agent.pid)/ ]; then
+                echo "Failed to start ssh-agent"
+                return 1
+            fi
         else
             echo "SSH keys do not exist"
             return 1
         fi
 
-        eval set -- "-D $ports -f /etc/ssh/sshd_config $keys"
+        eval set -- "-D ${ports} -f /etc/ssh/sshd_config ${keys}"
         /sbin/sshd "$@" &
-        echo $! >/run/initram-openssh.pid
+        echo -n $! >/run/initram-openssh.pid
 
         echo "Started OpenSSH server"
     fi
